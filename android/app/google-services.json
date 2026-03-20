@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "449277276440",
+    "firebase_url": "https://veloxi-7aaf6-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "veloxi-7aaf6",
+    "storage_bucket": "veloxi-7aaf6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:449277276440:android:0526c86852ffb6c4a02e6d",
+        "android_client_info": {
+          "package_name": "com.tsdigital.veloxiapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "449277276440-nr1bacb7crd196k5k5d10k3e49v271n2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tsdigital.veloxiapp",
+            "certificate_hash": "8c3fe03efedec6632e496b26e797026674d19a42"
+          }
+        },
+        {
+          "client_id": "449277276440-u13df033c77v16f46agvg89mea46cstj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tsdigital.veloxiapp",
+            "certificate_hash": "e7b4abd3aeacec3f70cd12ff1457be17f0641d50"
+          }
+        },
+        {
+          "client_id": "449277276440-f9cfs5j43tt35j942r54qvjgsc8buq2h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCB_N3-2B7-_rLQATQ2u0MPJ4K1IflNgjk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "449277276440-f9cfs5j43tt35j942r54qvjgsc8buq2h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "449277276440-t7qm7l51c592ob3loc1c92ghep24ij11.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.tsdigital.veloxiapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
