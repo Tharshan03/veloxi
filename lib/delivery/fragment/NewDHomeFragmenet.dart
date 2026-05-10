@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../main/utils/dynamic_theme.dart';
+
 class DriverDashboardUI extends StatefulWidget {
   const DriverDashboardUI({super.key});
 
@@ -191,9 +193,7 @@ class _DriverDashboardUIState extends State<DriverDashboardUI> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF4FACFE), Color(0xFF00C6FB)],
-                        ),
+                        gradient: ColorUtils.tealGradient,
                         borderRadius: BorderRadius.circular(24),
                       ),
                       child: const Text(
@@ -210,9 +210,7 @@ class _DriverDashboardUIState extends State<DriverDashboardUI> {
               Container(
                 height: 56,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF4FACFE), Color(0xFF00C6FB)],
-                  ),
+                  gradient: ColorUtils.tealGradient,
                   borderRadius: BorderRadius.circular(28),
                 ),
                 child: const Center(

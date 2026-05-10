@@ -115,14 +115,21 @@ Decoration boxDecorationWithRoundedCorners({
   DecorationImage? decorationImage,
   BoxShape boxShape = BoxShape.rectangle,
 }) {
+  final bool usePrimaryGradient =
+      gradient == null &&
+      backgroundColor != null &&
+      backgroundColor.toARGB32() == ColorUtils.colorPrimary.toARGB32();
+
   return BoxDecoration(
-    color: backgroundColor == null
-        ? appStore.isDarkMode
-            ? ColorUtils.cardDarkColor
-            : cardLightColor
-        : backgroundColor,
+    color: usePrimaryGradient
+        ? null
+        : (backgroundColor == null
+            ? appStore.isDarkMode
+                ? ColorUtils.cardDarkColor
+                : cardLightColor
+            : backgroundColor),
     borderRadius: boxShape == BoxShape.circle ? null : (borderRadius ?? radius()),
-    gradient: gradient,
+    gradient: gradient ?? (usePrimaryGradient ? ColorUtils.tealGradient : null),
     border: border,
     boxShadow: boxShadow,
     image: decorationImage,
@@ -145,6 +152,11 @@ Decoration boxDecorationWithShadow({
   BorderRadius? borderRadius,
 }) {
   print(backgroundColor);
+  final bool usePrimaryGradient =
+      gradient == null &&
+      backgroundColor != null &&
+      backgroundColor.toARGB32() == ColorUtils.colorPrimary.toARGB32();
+
   return BoxDecoration(
     boxShadow: boxShadow ??
         defaultBoxShadow(
@@ -153,12 +165,14 @@ Decoration boxDecorationWithShadow({
           spreadRadius: spreadRadius,
           offset: offset,
         ),
-    color: backgroundColor == null
-        ? appStore.isDarkMode
-            ? ColorUtils.cardDarkColor
-            : cardLightColor
-        : backgroundColor,
-    gradient: gradient,
+    color: usePrimaryGradient
+        ? null
+        : (backgroundColor == null
+            ? appStore.isDarkMode
+                ? ColorUtils.cardDarkColor
+                : cardLightColor
+            : backgroundColor),
+    gradient: gradient ?? (usePrimaryGradient ? ColorUtils.tealGradient : null),
     border: border,
     image: decorationImage,
     shape: boxShape,
@@ -176,6 +190,11 @@ Decoration boxDecorationRoundedWithShadow(
   Offset offset = const Offset(0, 0),
   LinearGradient? gradient,
 }) {
+  final bool usePrimaryGradient =
+      gradient == null &&
+      backgroundColor != null &&
+      backgroundColor.toARGB32() == ColorUtils.colorPrimary.toARGB32();
+
   return BoxDecoration(
     boxShadow: defaultBoxShadow(
       shadowColor: shadowColor ?? Colors.grey.withValues(alpha:0.065),
@@ -183,12 +202,14 @@ Decoration boxDecorationRoundedWithShadow(
       spreadRadius: spreadRadius ?? defaultSpreadRadius,
       offset: offset,
     ),
-    color: backgroundColor == null
-        ? appStore.isDarkMode
-            ? ColorUtils.cardDarkColor
-            : cardLightColor
-        : backgroundColor,
-    gradient: gradient,
+    color: usePrimaryGradient
+        ? null
+        : (backgroundColor == null
+            ? appStore.isDarkMode
+                ? ColorUtils.cardDarkColor
+                : cardLightColor
+            : backgroundColor),
+    gradient: gradient ?? (usePrimaryGradient ? ColorUtils.tealGradient : null),
     borderRadius: radius(radiusAll.toDouble()),
   );
 }

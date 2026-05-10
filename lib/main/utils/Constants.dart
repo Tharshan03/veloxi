@@ -9,6 +9,12 @@ import '../../extensions/common.dart';
 const mAppName = 'Veloxi';
 //endregion
 
+// ─── Veloxi feature flags ─────────────────────────────────
+/// When false, "Schedule" delivery option is hidden across the app
+/// (CreateOrderScreen, ReturnOrderScreen, …). Re-enable by flipping to true.
+const bool kFeatureSchedule = false;
+// ──────────────────────────────────────────────────────────
+
 //region Baseurl
 //Note: Domain url is where you uploaded your laravel code
 // Don't add slash at the end of the url

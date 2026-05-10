@@ -115,7 +115,7 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
 
   int selectedTabIndex = 0;
 
-  bool isDeliverNow = true;
+  bool isDeliverNow = true; // 🚧 Schedule disabled for now — keep true
   int isSelected = 2;
 
   bool? isCash = false;
@@ -684,19 +684,20 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
             crossAxisAlignment: .center,
             mainAxisAlignment: .spaceBetween,
             children: [
+              // 🚧 Schedule controlled by Constants.kFeatureSchedule
               scheduleOptionWidget(
-                      context, isDeliverNow, ic_clock, language.deliveryNow)
+                      context, kFeatureSchedule ? isDeliverNow : true, ic_clock, language.deliveryNow)
                   .onTap(() {
                 isDeliverNow = true;
                 setState(() {});
               }).expand(),
-              8.width,
+              8.width.visible(kFeatureSchedule),
               scheduleOptionWidget(
                       context, !isDeliverNow, ic_schedule, language.schedule)
                   .onTap(() {
                 isDeliverNow = false;
                 setState(() {});
-              }).expand(),
+              }).expand().visible(kFeatureSchedule),
             ],
           ),
           16.height,
@@ -2205,9 +2206,10 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // ignore: deprecated_member_use
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
         if (selectedTabIndex == 0) {
           await showInDialog(
             context,
@@ -2232,11 +2234,9 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
               );
             },
           );
-          return false;
         } else {
           selectedTabIndex--;
           setState(() {});
-          return false;
         }
       },
       child: CommonScaffoldComponent(

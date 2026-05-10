@@ -92,112 +92,235 @@ class OrderHistoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDelivered = orderData.status == ORDER_DELIVERED;
+    final String statusLabel = orderData.status.validate().isNotEmpty
+        ? orderStatus(orderData.status.validate())
+        : language.delivered;
+    final Color statusAccent = statusColor(orderData.status.validate());
+    final Color headerTint = appStore.isDarkMode ? ColorUtils.scaffoldSecondaryDark : const Color(0xFFF3FBFB);
+
     return Container(
-        width: context.width(),
-        margin: .only(bottom: 16),
-        decoration: boxDecorationWithRoundedCorners(
-            borderRadius: BorderRadius.circular(defaultRadius),
-            border: Border.all(color: ColorUtils.colorPrimary.withValues(alpha:0.3)),
-            backgroundColor: Colors.transparent),
-        padding: .all(12),
-        child: Column(crossAxisAlignment: .start, children: [
-          if (orderData.date != null)
-            Row(
-              children: [
-                Text(
-                        DateFormat('dd MMM yyyy').format(DateTime.parse("${orderData.date!}")) +
-                            " ${language.at.toLowerCase()} " +
-                            DateFormat('hh:mm a').format(DateTime.parse("${orderData.date!}")),
-                        style: primaryTextStyle(size: 14))
-                    .expand(),
-                if (orderData.status != ORDER_CANCELLED) Text(printAmount(orderData.totalAmount ?? 0), style: boldTextStyle()),
-              ],
-            ),
-          8.height,
-          Row(
-            crossAxisAlignment: .start,
-            children: [
-              Container(
-                decoration: boxDecorationWithRoundedCorners(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: ColorUtils.borderColor, width: appStore.isDarkMode ? 0.2 : 1),
-                    backgroundColor: context.cardColor),
-                padding: .all(8),
-                child: Image.asset(parcelTypeIcon(orderData.parcelType.validate()), height: 24, width: 24, color: ColorUtils.colorPrimary),
+      width: context.width(),
+      margin: .only(bottom: 16),
+      decoration: boxDecorationWithRoundedCorners(
+        borderRadius: BorderRadius.circular(defaultRadius),
+        border: Border.all(color: ColorUtils.colorPrimary.withValues(alpha: 0.10)),
+        backgroundColor: appStore.isDarkMode ? ColorUtils.cardDarkColor : context.cardColor,
+        boxShadow: defaultBoxShadow(
+          shadowColor: Colors.black.withValues(alpha: 0.06),
+          blurRadius: 24,
+          spreadRadius: 0,
+          offset: const Offset(0, 10),
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(defaultRadius),
+        child: Column(
+          crossAxisAlignment: .start,
+          children: [
+            Container(
+              padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+              decoration: BoxDecoration(
+                color: headerTint,
+                border: Border(bottom: BorderSide(color: ColorUtils.borderColor.withValues(alpha: 0.45))),
               ),
-              8.width,
-              Column(
-                crossAxisAlignment: .start,
+              child: Column(
                 children: [
-                  Text(orderData.parcelType.validate(), style: boldTextStyle(), maxLines: 1, overflow: TextOverflow.ellipsis),
-                  4.height,
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('# ${orderData.id}', style: boldTextStyle(size: 14)).expand(),
+                      Container(
+                        decoration: boxDecorationWithRoundedCorners(
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: ColorUtils.borderColor, width: appStore.isDarkMode ? 0.2 : 1),
+                          backgroundColor: appStore.isDarkMode ? ColorUtils.scaffoldSecondaryDark : const Color(0xFFE8FFFC),
+                        ),
+                        padding: .all(10),
+                        child: Image.asset(
+                          parcelTypeIcon(orderData.parcelType.validate()),
+                          height: 26,
+                          width: 26,
+                          color: ColorUtils.colorPrimary,
+                        ),
+                      ),
+                      12.width,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: .start,
+                          children: [
+                            Text(orderData.parcelType.validate(), style: boldTextStyle(size: 15), maxLines: 1, overflow: TextOverflow.ellipsis),
+                            4.height,
+                            Text('VELO-${orderData.id}', style: secondaryTextStyle(size: 13)),
+                            8.height,
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                _miniBadge(
+                                  context,
+                                  text: statusLabel,
+                                  color: statusAccent,
+                                  background: statusAccent.withValues(alpha: appStore.isDarkMode ? 0.18 : 0.12),
+                                ),
+                                if (orderData.date != null)
+                                  _miniBadge(
+                                    context,
+                                    text: DateFormat('dd MMM, hh:mm a').format(DateTime.parse("${orderData.date!}")),
+                                    color: textSecondaryColorGlobal,
+                                    background: appStore.isDarkMode ? ColorUtils.scaffoldSecondaryDark : Colors.white,
+                                  ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (orderData.status != ORDER_CANCELLED)
+                        Text(
+                          printAmount(orderData.totalAmount ?? 0),
+                          style: boldTextStyle(size: 16, color: ColorUtils.colorPrimary),
+                        ),
                     ],
                   ),
                 ],
-              ).expand(),
-            ],
-          ),
-          8.height,
-          if (orderData.pickupDatetime != null)
-            Column(
-              crossAxisAlignment: .start,
-              children: [
-                Text(language.picked, style: secondaryTextStyle(size: 12)),
-                4.height,
-                Text('${language.at} ${printDateWithoutAt("${orderData.pickupDatetime!}Z")}', style: secondaryTextStyle(size: 12)),
-              ],
+              ),
             ),
-          Row(
-            children: [
-              ImageIcon(AssetImage(ic_from), size: 24, color: ColorUtils.colorPrimary),
-              12.width,
-              Text('${orderData.pickupPoint!.address}', style: primaryTextStyle()).expand(),
-            ],
-          ),
-          8.height,
-          if (orderData.deliveryDatetime != null)
-            Column(
-              crossAxisAlignment: .start,
-              children: [
-                Text(language.delivered, style: secondaryTextStyle(size: 12)),
-                4.height,
-                Text('${language.at} ${printDateWithoutAt("${orderData.deliveryDatetime!}Z")}', style: secondaryTextStyle(size: 12)),
-              ],
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: .start,
+                children: [
+                  _buildTimelineRow(
+                    context,
+                    icon: ic_from,
+                    title: language.picked,
+                    address: orderData.pickupPoint!.address.validate(),
+                    dateTime: orderData.pickupDatetime,
+                  ),
+                  Container(
+                    margin: .only(left: 11, top: 8, bottom: 8),
+                    width: 2,
+                    height: 26,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          ColorUtils.colorPrimary.withValues(alpha: 0.28),
+                          ColorUtils.colorPrimary.withValues(alpha: 0.08),
+                        ],
+                      ),
+                    ),
+                  ),
+                  _buildTimelineRow(
+                    context,
+                    icon: ic_to,
+                    title: language.delivered,
+                    address: orderData.deliveryPoint!.address.validate(),
+                    dateTime: orderData.deliveryDatetime,
+                  ),
+                  if (isDelivered) ...[
+                    16.height,
+                    Container(
+                      width: context.width(),
+                      decoration: BoxDecoration(
+                        gradient: ColorUtils.tealGradient,
+                        borderRadius: BorderRadius.circular(defaultRadius),
+                        boxShadow: [
+                          BoxShadow(
+                            color: ColorUtils.colorPrimary.withValues(alpha: 0.22),
+                            blurRadius: 16,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(defaultRadius),
+                          onTap: () {
+                            print("invice ${orderData.invoice}");
+                            PDFViewer(
+                              invoice: "${orderData.invoice.validate()}",
+                              filename: "${orderData.id.validate()}",
+                            ).launch(context);
+                          },
+                          child: Padding(
+                            padding: .symmetric(horizontal: 12, vertical: 14),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Ionicons.md_download_outline, color: Colors.white, size: 18),
+                                8.width,
+                                Text(language.invoice, style: boldTextStyle(color: Colors.white, size: 14)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ),
-          Row(
-            children: [
-              ImageIcon(AssetImage(ic_to), size: 24, color: ColorUtils.colorPrimary),
-              12.width,
-              Text('${orderData.deliveryPoint!.address}', style: primaryTextStyle(), textAlign: TextAlign.start).expand(),
-            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _miniBadge(BuildContext context, {required String text, required Color color, required Color background}) {
+    return Container(
+      padding: .symmetric(horizontal: 10, vertical: 5),
+      decoration: boxDecorationWithRoundedCorners(
+        borderRadius: BorderRadius.circular(14),
+        backgroundColor: background,
+      ),
+      child: Text(text, style: boldTextStyle(size: 11, color: color)),
+    );
+  }
+
+  Widget _buildTimelineRow(
+    BuildContext context, {
+    required String icon,
+    required String title,
+    required String address,
+    String? dateTime,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          decoration: boxDecorationWithRoundedCorners(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: ColorUtils.borderColor, width: appStore.isDarkMode ? 0.2 : 1),
+            backgroundColor: appStore.isDarkMode ? ColorUtils.scaffoldSecondaryDark : const Color(0xFFF7FFFE),
           ),
-          8.height,
-          if (orderData.status == ORDER_DELIVERED)
-            Row(
-              children: [
+          padding: .all(8),
+          child: Image.asset(icon, height: 20, width: 20, color: ColorUtils.colorPrimary),
+        ),
+        12.width,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: .start,
+            children: [
+              Text(title, style: secondaryTextStyle(size: 12, color: ColorUtils.colorPrimary)),
+              4.height,
+              Text(address, style: primaryTextStyle(size: 14), maxLines: 2, overflow: TextOverflow.ellipsis),
+              if (dateTime != null) ...[
+                6.height,
                 Container(
-                  padding: .symmetric(horizontal: 12, vertical: 4),
-                  decoration: boxDecorationWithRoundedCorners(backgroundColor: ColorUtils.colorPrimary),
-                  child: Row(
-                    children: [
-                      Text(language.invoice, style: secondaryTextStyle(color: Colors.white)),
-                      4.width,
-                      Icon(Ionicons.md_download_outline, color: Colors.white, size: 18).paddingBottom(4),
-                    ],
-                  ).onTap(() {
-                    // generateInvoiceCall(widget.item);
-                    print("invice ${orderData.invoice}");
-                    PDFViewer(
-                      invoice: "${orderData.invoice.validate()}",
-                      filename: "${orderData.id.validate()}",
-                    ).launch(context);
-                  }),
+                  padding: .symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: ColorUtils.colorPrimary.withValues(alpha: appStore.isDarkMode ? 0.16 : 0.08),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(printDateWithoutAt("${dateTime}Z"), style: secondaryTextStyle(size: 11)),
                 ),
               ],
-            ),
-        ]));
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }

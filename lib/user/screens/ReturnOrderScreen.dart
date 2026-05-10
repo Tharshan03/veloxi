@@ -192,15 +192,16 @@ class ReturnOrderScreenState extends State<ReturnOrderScreen> {
                 children: [
                   Row(
                     children: [
-                      scheduleOptionWidget(context, isDeliverNow, ic_clock, language.deliveryNow).onTap(() {
+                      // 🚧 Schedule controlled by Constants.kFeatureSchedule
+                      scheduleOptionWidget(context, true, ic_clock, language.deliveryNow).onTap(() {
                         isDeliverNow = true;
                         setState(() {});
                       }).expand(),
-                      16.width,
+                      16.width.visible(kFeatureSchedule),
                       scheduleOptionWidget(context, !isDeliverNow, ic_schedule, language.schedule).onTap(() {
                         isDeliverNow = false;
                         setState(() {});
-                      }).expand(),
+                      }).expand().visible(kFeatureSchedule),
                     ],
                   ),
                   16.height,
@@ -392,7 +393,7 @@ class ReturnOrderScreenState extends State<ReturnOrderScreen> {
                       16.width,
                       DropdownButtonFormField<String>(
                         isExpanded: true,
-                        value: paymentCollectFrom,
+                        initialValue: paymentCollectFrom,
                         decoration: commonInputDecoration(),
                         items: [
                           DropdownMenuItem(value: PAYMENT_ON_PICKUP, child: Text(language.pickupLocation, style: primaryTextStyle(), maxLines: 1)),
@@ -409,7 +410,7 @@ class ReturnOrderScreenState extends State<ReturnOrderScreen> {
                   Text(language.reason, style: boldTextStyle()),
                   8.height,
                   DropdownButtonFormField<String>(
-                    value: reason,
+                    initialValue: reason,
                     isExpanded: true,
                     decoration: commonInputDecoration(),
                     items: returnOrderReasonList.map((e) {

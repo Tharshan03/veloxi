@@ -121,25 +121,49 @@ class FilterOrderComponentState extends State<FilterOrderComponent> {
             8.height,
             Wrap(
               spacing: 8,
-              runSpacing: 0,
+              runSpacing: 8,
               children: statusList.map((item) {
-                return Chip(
-                  backgroundColor: selectedStatus == item ? ColorUtils.colorPrimary : Colors.transparent,
-                  label: Text(orderStatus(item)),
-                  elevation: 0,
-                  labelStyle: primaryTextStyle(size: 14, color: selectedStatus == item ? white : textPrimaryColorGlobal),
-                  padding: .zero,
-                  labelPadding: .symmetric(horizontal: 8, vertical: 2),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(defaultRadius),
-                    side: BorderSide(
-                        color: selectedStatus == item ? ColorUtils.colorPrimary : ColorUtils.borderColor,
-                        width: appStore.isDarkMode ? 0.2 : 1),
+                final bool isSelected = selectedStatus == item;
+                return GestureDetector(
+                  onTap: () {
+                    selectedStatus = isSelected ? null : item;
+                    setState(() {});
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 220),
+                    curve: Curves.easeOut,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      gradient: isSelected ? ColorUtils.tealGradient : null,
+                      color: isSelected
+                          ? null
+                          : (appStore.isDarkMode ? ColorUtils.scaffoldSecondaryDark : Colors.white),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(
+                        color: isSelected
+                            ? Colors.transparent
+                            : ColorUtils.borderColor,
+                        width: appStore.isDarkMode ? 0.4 : 1,
+                      ),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: ColorUtils.veloxiTeal.withValues(alpha: 0.28),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Text(
+                      orderStatus(item),
+                      style: primaryTextStyle(
+                        size: 13,
+                        color: isSelected ? white : textPrimaryColorGlobal,
+                      ),
+                    ),
                   ),
-                ).onTap(() {
-                  selectedStatus = item;
-                  setState(() {});
-                });
+                );
               }).toList(),
             ),
             16.height,

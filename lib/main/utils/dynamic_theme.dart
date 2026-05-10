@@ -12,76 +12,84 @@ class ColorUtils {
   static Color? _appButtonColorDark;
   static Color? _dividerColor;
   static Color? _cardDarkColor;
-  ColorUtils({String primaryHex = "FF573391"}) {
+
+  // ── Veloxi AFTER palette ──────────────────────────────
+  // primary teal accent
+  static const String veloxiPrimaryHex = "FF12C7B0";
+  static const Color veloxiTeal     = Color(0xFF12C7B0);
+  static const Color veloxiBlue     = Color(0xFF0088FF);
+  // navy backgrounds
+  static const Color navyDeep       = Color(0xFF0F172A); // slate-900
+  static const Color navySurface    = Color(0xFF1E293B); // slate-800
+  static const Color navyCard       = Color(0xFF1E293B); // slate-800
+  static const Color navyBorder     = Color(0xFF334155); // slate-700
+  // gradient stops (AppBar / boutons)
+  static const LinearGradient tealGradient = LinearGradient(
+    colors: [veloxiTeal, veloxiBlue],
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  );
+  // ─────────────────────────────────────────────────────
+
+  ColorUtils({String primaryHex = veloxiPrimaryHex}) {
     themeColor = colorFromHex(primaryHex);
     _colorPrimary = colorFromHex(primaryHex);
-
     _initializeColors();
   }
+
   _initializeColors() async {
-    _colorPrimaryLight = Color(0xFFF5F5F5);
-    _borderColor = Color(0xFFEAEAEA);
-    _scaffoldSecondaryDark = Color(0xFF1E1E1E);
-    _scaffoldColorDark = Color(0xFF090909);
-    _scaffoldColorLight = Colors.white;
-    _appButtonColorDark = Color(0xFF282828);
-    _dividerColor = Color(0xFFD3D3D3);
-    _cardDarkColor = Color(0xFF2F2F2F);
-    bottomNavigationBarColor("#6b7cff");
+    _colorPrimaryLight = const Color(0xFFF0FDFB);
+    _borderColor       = const Color(0xFFD1FAF4);
+    _scaffoldSecondaryDark = navySurface;
+    _scaffoldColorDark     = navyDeep;
+    _scaffoldColorLight    = Colors.white;
+    _appButtonColorDark    = navyCard;
+    _dividerColor          = navyBorder;
+    _cardDarkColor         = navyCard;
+    _bottomNavigationColor = const Color(0xFF0F1923);
   }
 
   static void updateColors(String color) {
-    themeColor = colorFromHex(color);
+    themeColor    = colorFromHex(color);
     _colorPrimary = colorFromHex(color);
-    _colorPrimaryLight = Color(0xFFF5F5F5);
-    _borderColor = Color(0xFFEAEAEA);
-    _scaffoldSecondaryDark = Color(0xFF1E1E1E);
-    _scaffoldColorDark = Color(0xFF090909);
-    _scaffoldColorLight = Colors.white;
-    _appButtonColorDark = Color(0xFF282828);
-    _dividerColor = Color(0xFFD3D3D3);
-    _cardDarkColor = Color(0xFF2F2F2F);
-    _bottomNavigationColor = bottomNavigationBarColor(color);
+    _colorPrimaryLight     = const Color(0xFFF0FDFB);
+    _borderColor           = const Color(0xFFD1FAF4);
+    _scaffoldSecondaryDark = navySurface;
+    _scaffoldColorDark     = navyDeep;
+    _scaffoldColorLight    = Colors.white;
+    _appButtonColorDark    = navyCard;
+    _dividerColor          = navyBorder;
+    _cardDarkColor         = navyCard;
+    _bottomNavigationColor = navySurface;
   }
 
   static Color colorFromHex(String hexColor) {
-    hexColor = hexColor.toUpperCase().replaceAll("#", "");
-    if (hexColor.length == 6) {
-      hexColor = "FF$hexColor";
-    }
+    hexColor = hexColor.toUpperCase().replaceAll('#', '');
+    if (hexColor.length == 6) hexColor = 'FF$hexColor';
     _colorPrimary = Color(int.parse(hexColor, radix: 16));
     return Color(int.parse(hexColor, radix: 16));
   }
 
   static Color bottomNavigationBarColor(String color) {
-    String convertedColor = color.substring(1);
-    Color colore = Color(int.parse('0xff$convertedColor'));
-    double lightenPercent = 90.0; // Lighten by 20%
-
-    Color hoverColor = lightenColor(colore, lightenPercent);
-
-    print('Original Color: $color');
-    print('Lightened Color: $hoverColor');
-    return hoverColor;
+    return navySurface;
   }
 
   static Color lightenColor(Color color, double percent) {
     final p = percent / 100;
-    final r = (color.red + ((255 - color.red) * p)).round();
-    final g = (color.green + ((255 - color.green) * p)).round();
-    final b = (color.blue + ((255 - color.blue) * p)).round();
-
+    final r = ((color.r * 255.0).round().clamp(0, 255) + ((255 - (color.r * 255.0).round().clamp(0, 255)) * p)).round();
+    final g = ((color.g * 255.0).round().clamp(0, 255) + ((255 - (color.g * 255.0).round().clamp(0, 255)) * p)).round();
+    final b = ((color.b * 255.0).round().clamp(0, 255) + ((255 - (color.b * 255.0).round().clamp(0, 255)) * p)).round();
     return Color.fromRGBO(r, g, b, 1.0);
   }
 
-  static Color get colorPrimary => _colorPrimary ?? Color(0xFF573391);
-  static Color get colorPrimaryLight => _colorPrimaryLight ?? Color(0xFFF5F5F5);
-  static Color get borderColor => _borderColor ?? Color(0xFFEAEAEA);
-  static Color get bottomNavigationColor => _bottomNavigationColor ?? Color(0xFFD6CDE4);
-  static Color get scaffoldSecondaryDark => _scaffoldSecondaryDark ?? Color(0xFF1E1E1E);
-  static Color get scaffoldColorDark => _scaffoldColorDark ?? Color(0xFF090909);
-  static Color get scaffoldColorLight => _scaffoldColorLight ?? Colors.white;
-  static Color get appButtonColorDark => _appButtonColorDark ?? Color(0xFF282828);
-  static Color get dividerColor => _dividerColor ?? Color(0xFFD3D3D3);
-  static Color get cardDarkColor => _cardDarkColor ?? Colors.black;
+  static Color get colorPrimary          => _colorPrimary          ?? veloxiTeal;
+  static Color get colorPrimaryLight     => _colorPrimaryLight     ?? const Color(0xFFF0FDFB);
+  static Color get borderColor           => _borderColor           ?? const Color(0xFFD1FAF4);
+  static Color get bottomNavigationColor => _bottomNavigationColor ?? navySurface;
+  static Color get scaffoldSecondaryDark => _scaffoldSecondaryDark ?? navySurface;
+  static Color get scaffoldColorDark     => _scaffoldColorDark     ?? navyDeep;
+  static Color get scaffoldColorLight    => _scaffoldColorLight    ?? Colors.white;
+  static Color get appButtonColorDark    => _appButtonColorDark    ?? navyCard;
+  static Color get dividerColor          => _dividerColor          ?? navyBorder;
+  static Color get cardDarkColor         => _cardDarkColor         ?? navyCard;
 }

@@ -13,9 +13,13 @@ class BodyCornerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: appStore.isDarkMode ? ColorUtils.scaffoldSecondaryDark : ColorUtils.colorPrimary,
+      decoration: BoxDecoration(
+        gradient: appStore.isDarkMode
+            ? ColorUtils.tealGradient
+            : LinearGradient(colors: [ColorUtils.colorPrimary, ColorUtils.colorPrimary]),
+      ),
       child: Container(
-        color: ColorUtils.colorPrimaryLight,
+        color: appStore.isDarkMode ? ColorUtils.scaffoldColorDark : ColorUtils.colorPrimaryLight,
         height: context.height(),
         width: context.width(),
         child: child,

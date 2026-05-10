@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import '../main/utils/dynamic_theme.dart';
 
-const scaffoldLightColor = Color(0xFFEBF2F7);
-const scaffoldDarkColor = Color(0xFF0E1116);
-const cardDarkColor = Color(0xFF2F2F2F);
-const dividerDarkColor = Color(0xFF393D45);
-const cardLightColor = Color(0xFFFFFFFF);
+const scaffoldLightColor = Color(0xFFF0FDFB);
+const scaffoldDarkColor  = Color(0xFF0F172A); // slate-900
+const cardDarkColor      = Color(0xFF1E293B); // slate-800
+const dividerDarkColor   = Color(0xFF334155); // slate-700
+const cardLightColor     = Color(0xFFFFFFFF);
 
 const textPrimaryColor = Color(0xFF2E3033);
 const textSecondaryColor = Color(0xFF757575);

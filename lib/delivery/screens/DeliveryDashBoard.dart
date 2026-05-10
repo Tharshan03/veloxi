@@ -485,8 +485,22 @@ class DeliveryDashBoardState extends State<DeliveryDashBoard> with WidgetsBindin
                     opacity: _isExpanded ? 1 : 0,
                     child: FloatingActionButton(
                       shape: RoundedRectangleBorder(borderRadius: radius(40)),
-                      backgroundColor: appStore.availableBal >= 0 ? ColorUtils.colorPrimary : textSecondaryColorGlobal,
-                      child: Icon(Icons.pin_drop_outlined, color: Colors.white),
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: ColorUtils.tealGradient,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: ColorUtils.colorPrimary.withValues(alpha: 0.24),
+                              blurRadius: 14,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(Icons.pin_drop_outlined, color: Colors.white),
+                      ),
                       onPressed: () {
                         OrdersMapScreen().launch(context);
                       },
@@ -506,11 +520,24 @@ class DeliveryDashBoardState extends State<DeliveryDashBoard> with WidgetsBindin
                           configureCrispChat();
                           await FlutterCrispChat.openCrispChat(config: configData);
                         },
-                        backgroundColor: ColorUtils.colorPrimary,
-                        // Use your app's primary color
-                        child: CachedNetworkImage(
-                          imageUrl: crispChatIcon ?? "",
-                          errorWidget: (context, url, error) => Icon(Icons.chat_bubble_outline),
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: ColorUtils.tealGradient,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: ColorUtils.colorPrimary.withValues(alpha: 0.22),
+                                blurRadius: 14,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: CachedNetworkImage(
+                            imageUrl: crispChatIcon ?? "",
+                            errorWidget: (context, url, error) => const Icon(Icons.chat_bubble_outline, color: Colors.white),
+                          ),
                         )),
                   ),
                 ),
@@ -518,8 +545,22 @@ class DeliveryDashBoardState extends State<DeliveryDashBoard> with WidgetsBindin
                 FloatingActionButton(
                   // heroTag: "main",
                   onPressed: _toggleFAB,
-                  backgroundColor: ColorUtils.colorPrimary,
-                  child: Icon(_isExpanded ? Icons.close : Icons.menu),
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: ColorUtils.tealGradient,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: ColorUtils.colorPrimary.withValues(alpha: 0.28),
+                          blurRadius: 18,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: Icon(_isExpanded ? Icons.close : Icons.menu, color: Colors.white),
+                  ),
                 ).paddingAll(10),
               ],
             )
@@ -632,12 +673,27 @@ class DeliveryDashBoardState extends State<DeliveryDashBoard> with WidgetsBindin
                       }).paddingSymmetric(horizontal: 5)
                     : SizedBox(),
                 (statusList[selectedStatusIndex] != ORDER_CANCELLED && statusList[selectedStatusIndex] != ORDER_ASSIGNED && statusList[selectedStatusIndex] != ORDER_PENDING)
-                    ? AppButton(
+                    ? DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: ColorUtils.tealGradient,
+                          borderRadius: radius(defaultAppButtonRadius),
+                          boxShadow: [
+                            BoxShadow(
+                              color: ColorUtils.veloxiTeal.withValues(alpha: 0.35),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: AppButton(
                         elevation: 0,
                         text: buttonText(statusList[selectedStatusIndex]),
                         padding: .symmetric(vertical: 4, horizontal: 8),
                         textStyle: boldTextStyle(color: Colors.white, size: 14),
-                        color: ColorUtils.colorPrimary,
+                        color: Colors.transparent,
+                        shapeBorder: RoundedRectangleBorder(
+                          borderRadius: radius(defaultAppButtonRadius),
+                        ),
                         onTap: () {
                           if (statusList[selectedStatusIndex] == ORDER_ACCEPTED) {
                             onTapData(orderData: data, orderStatus: statusList[selectedStatusIndex]);
@@ -791,6 +847,7 @@ class DeliveryDashBoardState extends State<DeliveryDashBoard> with WidgetsBindin
                             );
                           }
                         },
+                      ),
                       )
                         .visible(statusList[selectedStatusIndex] != ORDER_DELIVERED && statusList[selectedStatusIndex] != ORDER_SHIPPED)
                         .paddingOnly(right: appStore.selectedLanguage == "ar" ? 10 : 0)
@@ -923,12 +980,8 @@ class DeliveryDashBoardState extends State<DeliveryDashBoard> with WidgetsBindin
               children: [
                 Align(
                   alignment: Alignment.topRight,
-                  child: AppButton(
-                    elevation: 0,
-                    color: Colors.transparent,
-                    padding: .symmetric(vertical: 8, horizontal: 16),
-                    shapeBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(defaultRadius), side: BorderSide(color: ColorUtils.colorPrimary)),
-                    child: Text(language.notifyUser, style: primaryTextStyle(color: ColorUtils.colorPrimary)),
+                  child: _GradientOutlineButton(
+                    label: language.notifyUser,
                     onTap: () {
                       showConfirmDialogCustom(
                         context,
@@ -1062,5 +1115,61 @@ class DeliveryDashBoardState extends State<DeliveryDashBoard> with WidgetsBindin
       return language.confirmDelivery;
     }
     return '';
+  }
+}
+
+/// Outline button with a brand teal→blue gradient border AND gradient text.
+/// Used for secondary actions (e.g. "Notify user") that should match the brand
+/// without competing with the filled gradient CTA next to them.
+class _GradientOutlineButton extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+  final double borderWidth;
+  final double borderRadius;
+
+  const _GradientOutlineButton({
+    required this.label,
+    required this.onTap,
+    this.borderWidth = 1.5,
+    this.borderRadius = 8,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final Color surface = Theme.of(context).cardColor;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(borderRadius),
+        onTap: onTap,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: ColorUtils.tealGradient,
+            borderRadius: BorderRadius.circular(borderRadius),
+          ),
+          padding: EdgeInsets.all(borderWidth),
+          child: Container(
+            decoration: BoxDecoration(
+              color: surface,
+              borderRadius: BorderRadius.circular(borderRadius - borderWidth),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: ShaderMask(
+              blendMode: BlendMode.srcIn,
+              shaderCallback: (bounds) => ColorUtils.tealGradient.createShader(
+                Rect.fromLTWH(0, 0, bounds.width, bounds.height),
+              ),
+              child: Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white, // overridden by ShaderMask
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

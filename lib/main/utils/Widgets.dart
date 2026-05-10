@@ -5,8 +5,6 @@ import '../../extensions/extension_util/context_extensions.dart';
 import '../../extensions/extension_util/int_extensions.dart';
 import '../../main/utils/dynamic_theme.dart';
 
-import '../../extensions/app_button.dart';
-import '../../extensions/colors.dart';
 import '../../extensions/decorations.dart';
 import '../../extensions/text_styles.dart';
 import '../../main.dart';
@@ -15,16 +13,28 @@ import 'Constants.dart';
 Widget commonButton(String title, Function() onTap, {double? width, Color? color, Color? textColor, int? size}) {
   return SizedBox(
     width: width,
-    child: AppButton(
-      padding: .symmetric(vertical: 14, horizontal: 16),
-      shapeBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(defaultRadius)),
-      elevation: 0,
-      child: Text(
-        title,
-        style: boldTextStyle(color: textColor ?? white, size: size ?? textBoldSizeGlobal.toInt()),
+    child: Container(
+      height: 48,
+      decoration: BoxDecoration(
+        gradient: color != null
+            ? null
+            : ColorUtils.tealGradient,
+        color: color,
+        borderRadius: BorderRadius.circular(defaultRadius),
       ),
-      color: color ?? ColorUtils.colorPrimary,
-      onTap: onTap,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(defaultRadius),
+          onTap: onTap,
+          child: Center(
+            child: Text(
+              title,
+              style: boldTextStyle(color: textColor ?? Colors.white, size: size ?? textBoldSizeGlobal.toInt()),
+            ),
+          ),
+        ),
+      ),
     ),
   );
 }
@@ -33,14 +43,12 @@ Widget outlineButton(String title, Function() onTap, {double? width, Color? colo
   return SizedBox(
     width: width,
     child: TextButton(
-      child: Text(
-        title,
-        style: boldTextStyle(color: color ?? textPrimaryColorGlobal),
-      ),
+      child: Text(title, style: boldTextStyle(color: color ?? ColorUtils.colorPrimary)),
       onPressed: onTap,
       style: TextButton.styleFrom(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(defaultRadius), side: BorderSide(color: color ?? ColorUtils.borderColor)),
+            borderRadius: BorderRadius.circular(defaultRadius),
+            side: BorderSide(color: color ?? ColorUtils.colorPrimary)),
         elevation: 0,
         padding: .symmetric(vertical: 14, horizontal: 16),
         backgroundColor: Colors.transparent,
@@ -53,20 +61,20 @@ Widget scheduleOptionWidget(BuildContext context, bool isSelected, String imageP
   return Container(
     padding: .all(16),
     alignment: Alignment.center,
-    decoration: boxDecorationWithRoundedCorners(
-        border: Border.all(
-            color: isSelected
-                ? ColorUtils.colorPrimary
-                : appStore.isDarkMode
-                    ? Colors.transparent
-                    : ColorUtils.borderColor),
-        backgroundColor: isSelected ? ColorUtils.colorPrimary : context.cardColor),
+    decoration: isSelected
+        ? BoxDecoration(
+            gradient: ColorUtils.tealGradient,
+            borderRadius: BorderRadius.circular(defaultRadius),
+          )
+        : boxDecorationWithRoundedCorners(
+            border: Border.all(color: appStore.isDarkMode ? ColorUtils.dividerColor : ColorUtils.borderColor),
+            backgroundColor: context.cardColor),
     child: Row(
       crossAxisAlignment: .center,
       mainAxisAlignment: .center,
       children: [
-        Icon(title == language.schedule ? Feather.calendar : Feather.clock, size: 18, color: isSelected ? Colors.white : context.iconColor),
-        // ImageIcon(AssetImage(imagePath), size: 20, color: isSelected ? colorPrimary : Colors.grey),
+        Icon(title == language.schedule ? Feather.calendar : Feather.clock,
+            size: 18, color: isSelected ? Colors.white : context.iconColor),
         8.width,
         Text(title, style: boldTextStyle(color: isSelected ? Colors.white : textPrimaryColorGlobal)),
       ],
@@ -78,22 +86,19 @@ Widget enableBidOptionWidget(BuildContext context, bool isSelected, IconData ico
   return Container(
     padding: .all(16),
     alignment: Alignment.center,
-    decoration: boxDecorationWithRoundedCorners(
-        border: Border.all(
-            color: isSelected
-                ? ColorUtils.colorPrimary
-                : appStore.isDarkMode
-                    ? Colors.transparent
-                    : ColorUtils.borderColor),
-        backgroundColor: isSelected ? ColorUtils.colorPrimary : context.cardColor),
+    decoration: isSelected
+        ? BoxDecoration(
+            gradient: ColorUtils.tealGradient,
+            borderRadius: BorderRadius.circular(defaultRadius),
+          )
+        : boxDecorationWithRoundedCorners(
+            border: Border.all(color: appStore.isDarkMode ? ColorUtils.dividerColor : ColorUtils.borderColor),
+            backgroundColor: context.cardColor),
     child: Row(
       crossAxisAlignment: .center,
       mainAxisAlignment: .center,
       children: [
-        Icon(
-          icon,
-          color: isSelected ? Colors.white : context.iconColor,
-        ),
+        Icon(icon, color: isSelected ? Colors.white : context.iconColor),
         8.width,
         Text(title, style: boldTextStyle(color: isSelected ? Colors.white : textPrimaryColorGlobal)),
       ],
@@ -101,7 +106,7 @@ Widget enableBidOptionWidget(BuildContext context, bool isSelected, IconData ico
   );
 }
 
-/// Default AppBar
+/// Default AppBar — dégradé teal→bleu en dark, couleur primary en light
 AppBar commonAppBarWidget(
   String title, {
   @Deprecated('Use titleWidget instead') Widget? child,
@@ -123,19 +128,36 @@ AppBar commonAppBarWidget(
   PreferredSizeWidget? bottom,
   Widget? flexibleSpace,
 }) {
+  final bool useTealGradient = color == null && flexibleSpace == null;
+
+  final Widget? resolvedFlexibleSpace = flexibleSpace ??
+      (useTealGradient
+          ? Container(
+              decoration: BoxDecoration(
+                gradient: ColorUtils.tealGradient,
+              ),
+            )
+          : null);
+
   return AppBar(
     centerTitle: center,
-    title: titleWidget ?? Text(title, style: titleTextStyle ?? (boldTextStyle(color: textColor ?? Colors.white, size: textSize))),
+    title: titleWidget ??
+        Text(title,
+            style: titleTextStyle ?? boldTextStyle(color: textColor ?? Colors.white, size: textSize)),
     actions: actions ?? [],
     automaticallyImplyLeading: showBack,
-    backgroundColor: color ?? ColorUtils.colorPrimary,
+    backgroundColor: resolvedFlexibleSpace != null
+        ? Colors.transparent
+        : (color ?? ColorUtils.colorPrimary),
     leading: showBack ? (backWidget ?? BackButton(color: textColor ?? Colors.white)) : null,
     shadowColor: shadowColor,
-    shape: isBottom ? RoundedRectangleBorder(borderRadius: radiusOnly(bottomRight: 20, bottomLeft: 20)) : null,
+    shape: isBottom
+        ? RoundedRectangleBorder(borderRadius: radiusOnly(bottomRight: 20, bottomLeft: 20))
+        : null,
     elevation: elevation ?? defaultAppBarElevation,
     systemOverlayStyle: systemUiOverlayStyle,
     bottom: bottom,
     titleSpacing: showBack ? titleSpacing : 20,
-    flexibleSpace: flexibleSpace,
+    flexibleSpace: resolvedFlexibleSpace,
   );
 }

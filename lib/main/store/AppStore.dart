@@ -330,28 +330,31 @@ abstract class _AppStore with Store {
     avgRating = val;
   }
 
+  // ── Thèmes ────────────────────────────────────────────────────────────────
+
   @observable
   ThemeData lightTheme = ThemeData(
     primarySwatch: createMaterialColor(ColorUtils.colorPrimary),
     primaryColor: ColorUtils.colorPrimary,
     scaffoldBackgroundColor: Colors.white,
     fontFamily: GoogleFonts.roboto().fontFamily,
-    iconTheme: IconThemeData(color: Colors.black),
-    dialogBackgroundColor: Colors.white,
+    iconTheme: IconThemeData(color: Colors.black87),
     unselectedWidgetColor: Colors.grey,
-    dividerColor: dividerColor,
+    dividerColor: const Color(0xFFD1FAF4),
     cardColor: Colors.white,
-    tabBarTheme: TabBarThemeData(labelColor: Colors.black),
+    tabBarTheme: TabBarThemeData(labelColor: ColorUtils.colorPrimary),
     appBarTheme: AppBarTheme(
-        color: ColorUtils.colorPrimary,
+        backgroundColor: ColorUtils.colorPrimary,
         elevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarIconBrightness: Brightness.light,
+            statusBarIconBrightness: Brightness.dark,
             statusBarColor: Colors.transparent)),
-    dialogTheme: DialogThemeData(shape: dialogShape()),
+    dialogTheme: DialogThemeData(shape: dialogShape(), backgroundColor: Colors.white),
     bottomSheetTheme: BottomSheetThemeData(backgroundColor: Colors.white),
     colorScheme: ColorScheme.light(
       primary: ColorUtils.colorPrimary,
+      secondary: const Color(0xFF0088FF),
+      surface: Colors.white,
     ),
   ).copyWith(
     pageTransitionsTheme: PageTransitionsTheme(
@@ -367,38 +370,39 @@ abstract class _AppStore with Store {
   ThemeData darkTheme = ThemeData(
     primarySwatch: createMaterialColor(ColorUtils.colorPrimary),
     primaryColor: ColorUtils.colorPrimary,
-    scaffoldBackgroundColor: ColorUtils.scaffoldColorDark,
+    scaffoldBackgroundColor: const Color(0xFF0F172A),
     fontFamily: GoogleFonts.roboto().fontFamily,
-    iconTheme: IconThemeData(color: Colors.white),
-    dialogBackgroundColor: ColorUtils.scaffoldSecondaryDark,
-    unselectedWidgetColor: Colors.white60,
-    dividerColor: Colors.white12,
-    cardColor: ColorUtils.scaffoldSecondaryDark,
-    tabBarTheme: TabBarThemeData(labelColor: Colors.white),
-    appBarTheme: AppBarTheme(
-      color: ColorUtils.scaffoldSecondaryDark,
+    iconTheme: const IconThemeData(color: Colors.white),
+    unselectedWidgetColor: Colors.white38,
+    dividerColor: const Color(0xFF334155),
+    cardColor: const Color(0xFF1E293B),
+    tabBarTheme: TabBarThemeData(labelColor: ColorUtils.colorPrimary),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Color(0xFF1E293B),
       elevation: 0,
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarIconBrightness: Brightness.light,
         statusBarColor: Colors.transparent,
       ),
     ),
-    dialogTheme: DialogThemeData(shape: dialogShape()),
-    snackBarTheme:
-        SnackBarThemeData(backgroundColor: ColorUtils.appButtonColorDark),
-    bottomSheetTheme:
-        BottomSheetThemeData(backgroundColor: ColorUtils.appButtonColorDark),
+    dialogTheme: DialogThemeData(shape: dialogShape(), backgroundColor: const Color(0xFF1E293B)),
+    snackBarTheme: const SnackBarThemeData(backgroundColor: Color(0xFF1E293B)),
+    bottomSheetTheme: const BottomSheetThemeData(backgroundColor: Color(0xFF1E293B)),
     colorScheme: ColorScheme.dark(
       primary: ColorUtils.colorPrimary,
+      secondary: const Color(0xFF0088FF),
+      surface: const Color(0xFF1E293B),
+      onSurface: Colors.white,
     ),
   ).copyWith(
-      pageTransitionsTheme: PageTransitionsTheme(
-    builders: <TargetPlatform, PageTransitionsBuilder>{
-      TargetPlatform.android: OpenUpwardsPageTransitionsBuilder(),
-      TargetPlatform.linux: OpenUpwardsPageTransitionsBuilder(),
-      TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-    },
-  ));
+    pageTransitionsTheme: PageTransitionsTheme(
+      builders: <TargetPlatform, PageTransitionsBuilder>{
+        TargetPlatform.android: OpenUpwardsPageTransitionsBuilder(),
+        TargetPlatform.linux: OpenUpwardsPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+      },
+    ),
+  );
 
   @action
   void updateTheme(Color newColor) {
@@ -408,22 +412,23 @@ abstract class _AppStore with Store {
       primaryColor: newColor,
       scaffoldBackgroundColor: Colors.white,
       fontFamily: GoogleFonts.roboto().fontFamily,
-      iconTheme: IconThemeData(color: Colors.black),
-      dialogBackgroundColor: Colors.white,
+      iconTheme: IconThemeData(color: Colors.black87),
       unselectedWidgetColor: Colors.grey,
-      dividerColor: dividerColor,
+      dividerColor: const Color(0xFFD1FAF4),
       cardColor: Colors.white,
-      tabBarTheme: TabBarThemeData(labelColor: Colors.black),
+      tabBarTheme: TabBarThemeData(labelColor: newColor),
       appBarTheme: AppBarTheme(
-          color: newColor,
+          backgroundColor: newColor,
           elevation: 0,
           systemOverlayStyle: SystemUiOverlayStyle(
-              statusBarIconBrightness: Brightness.light,
+              statusBarIconBrightness: Brightness.dark,
               statusBarColor: Colors.transparent)),
-      dialogTheme: DialogThemeData(shape: dialogShape()),
+      dialogTheme: DialogThemeData(shape: dialogShape(), backgroundColor: Colors.white),
       bottomSheetTheme: BottomSheetThemeData(backgroundColor: Colors.white),
       colorScheme: ColorScheme.light(
         primary: newColor,
+        secondary: const Color(0xFF0088FF),
+        surface: Colors.white,
       ),
     ).copyWith(
       pageTransitionsTheme: PageTransitionsTheme(
@@ -440,34 +445,34 @@ abstract class _AppStore with Store {
       scaffoldBackgroundColor: ColorUtils.scaffoldColorDark,
       fontFamily: GoogleFonts.roboto().fontFamily,
       iconTheme: IconThemeData(color: Colors.white),
-      dialogBackgroundColor: ColorUtils.scaffoldSecondaryDark,
-      unselectedWidgetColor: Colors.white60,
-      dividerColor: Colors.white12,
-      cardColor: ColorUtils.scaffoldSecondaryDark,
-      tabBarTheme: TabBarThemeData(labelColor: Colors.white),
+      unselectedWidgetColor: Colors.white38,
+      dividerColor: ColorUtils.dividerColor,
+      cardColor: ColorUtils.cardDarkColor,
+      tabBarTheme: TabBarThemeData(labelColor: newColor),
       appBarTheme: AppBarTheme(
-        color: ColorUtils.scaffoldSecondaryDark,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarIconBrightness: Brightness.light,
           statusBarColor: Colors.transparent,
         ),
       ),
-      dialogTheme: DialogThemeData(shape: dialogShape()),
-      snackBarTheme:
-          SnackBarThemeData(backgroundColor: ColorUtils.appButtonColorDark),
-      bottomSheetTheme:
-          BottomSheetThemeData(backgroundColor: ColorUtils.appButtonColorDark),
+      dialogTheme: DialogThemeData(shape: dialogShape(), backgroundColor: ColorUtils.cardDarkColor),
+      snackBarTheme: SnackBarThemeData(backgroundColor: ColorUtils.appButtonColorDark),
+      bottomSheetTheme: BottomSheetThemeData(backgroundColor: ColorUtils.cardDarkColor),
       colorScheme: ColorScheme.dark(
         primary: newColor,
+        secondary: const Color(0xFF0088FF),
+        surface: ColorUtils.scaffoldSecondaryDark,
       ),
     ).copyWith(
-        pageTransitionsTheme: PageTransitionsTheme(
-      builders: <TargetPlatform, PageTransitionsBuilder>{
-        TargetPlatform.android: OpenUpwardsPageTransitionsBuilder(),
-        TargetPlatform.linux: OpenUpwardsPageTransitionsBuilder(),
-        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-      },
-    ));
+      pageTransitionsTheme: PageTransitionsTheme(
+        builders: <TargetPlatform, PageTransitionsBuilder>{
+          TargetPlatform.android: OpenUpwardsPageTransitionsBuilder(),
+          TargetPlatform.linux: OpenUpwardsPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        },
+      ),
+    );
   }
 }

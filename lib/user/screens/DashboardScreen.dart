@@ -126,7 +126,7 @@ class DashboardScreenState extends State<DashboardScreen> with WidgetsBindingObs
         });
       }
     } catch (e) {
-      print("Popup Error: $e");
+      if (kDebugMode) print("Popup Error: $e");
     }
   }
 
@@ -367,3 +367,4 @@ class DashboardScreenState extends State<DashboardScreen> with WidgetsBindingObs
     );
   }
 }
+

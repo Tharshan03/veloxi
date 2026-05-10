@@ -6,6 +6,7 @@ import '../../extensions/system_utils.dart';
 import '../../extensions/text_styles.dart';
 import '../main/utils/Colors.dart';
 import '../main/utils/Constants.dart';
+import '../main/utils/dynamic_theme.dart';
 import 'app_button.dart';
 import 'common.dart';
 import 'decorations.dart';
@@ -408,29 +409,43 @@ Future<bool?> showConfirmDialogCustom(
                       },
                     ).expand().visible(showCancelButton),
                     16.width.visible(showCancelButton),
-                    AppButton(
-                      elevation: 0,
-                      color: getDialogPrimaryColor(context, dialogType, primaryColor),
-                      shapeBorder: RoundedRectangleBorder(
-                        borderRadius: radius(defaultAppButtonRadius),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          getIcon(dialogType),
-                          6.width,
-                          Text(
-                            positiveText ?? getPositiveText(dialogType),
-                            style: boldTextStyle(color: positiveTextColor ?? Colors.white),
-                          ),
-                        ],
-                      ).fit(),
-                      onTap: () {
-                        onAccept.call(context);
+                    Builder(builder: (_) {
+                      final bool useBrandGradient =
+                          dialogType == DialogType.CONFIRMATION && primaryColor == null;
+                      final Widget positiveBtn = AppButton(
+                        elevation: 0,
+                        color: useBrandGradient
+                            ? Colors.transparent
+                            : getDialogPrimaryColor(context, dialogType, primaryColor),
+                        shapeBorder: RoundedRectangleBorder(
+                          borderRadius: radius(defaultAppButtonRadius),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            getIcon(dialogType),
+                            6.width,
+                            Text(
+                              positiveText ?? getPositiveText(dialogType),
+                              style: boldTextStyle(color: positiveTextColor ?? Colors.white),
+                            ),
+                          ],
+                        ).fit(),
+                        onTap: () {
+                          onAccept.call(context);
 
-                        if (cancelable) finish(context, true);
-                      },
-                    ).expand(),
+                          if (cancelable) finish(context, true);
+                        },
+                      );
+                      if (!useBrandGradient) return positiveBtn.expand();
+                      return DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: ColorUtils.tealGradient,
+                          borderRadius: radius(defaultAppButtonRadius),
+                        ),
+                        child: positiveBtn,
+                      ).expand();
+                    }),
                   ],
                 ),
               ],

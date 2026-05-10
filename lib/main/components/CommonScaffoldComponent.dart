@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../extensions/extension_util/bool_extensions.dart';
 import '../../main/utils/dynamic_theme.dart';
-
 import '../../main.dart';
 import '../utils/Widgets.dart';
 
@@ -33,8 +32,12 @@ class CommonScaffoldComponent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: extendedBody.validate(),
-      backgroundColor: appStore.isDarkMode ? ColorUtils.scaffoldSecondaryDark : ColorUtils.colorPrimaryLight,
-      appBar: appBar ?? commonAppBarWidget(appBarTitle ?? '', actions: action, showBack: showBack!, bottom: bottom),
+      backgroundColor: appStore.isDarkMode
+          ? ColorUtils.scaffoldColorDark
+          : ColorUtils.colorPrimaryLight,
+      appBar: appBar ??
+          commonAppBarWidget(appBarTitle ?? '',
+              actions: action, showBack: showBack!, bottom: bottom),
       body: body,
       bottomNavigationBar: bottomNavigationBar,
       floatingActionButton: floatingActionButton,

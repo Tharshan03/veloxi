@@ -3,6 +3,7 @@ import '../extensions/extension_util/string_extensions.dart';
 import '../extensions/extension_util/bool_extensions.dart';
 import '../extensions/text_styles.dart';
 import '../main/utils/Constants.dart';
+import '../main/utils/dynamic_theme.dart';
 import 'colors.dart';
 import 'common.dart';
 
@@ -107,37 +108,56 @@ class _AppButtonState extends State<AppButton> with SingleTickerProviderStateMix
   }
 
   Widget buildButton() {
+    final ShapeBorder resolvedShape = widget.shapeBorder ??
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        );
+    final bool isEnabled = widget.enabled.validate(value: true);
+    final bool useGradient = widget.color == null && isEnabled;
+
+    BorderRadius gradientRadius = BorderRadius.circular(12);
+    if (resolvedShape is RoundedRectangleBorder) {
+      gradientRadius = resolvedShape.borderRadius.resolve(Directionality.of(context));
+    }
+
+    final Widget button = MaterialButton(
+      minWidth: widget.width,
+      padding: widget.padding ?? dynamicAppButtonPadding(context),
+      onPressed: isEnabled
+          ? widget.onTap != null
+              ? widget.onTap as void Function()?
+              : null
+          : null,
+      color: useGradient ? Colors.transparent : (widget.color ?? appButtonBackgroundColorGlobal),
+      shape: resolvedShape,
+      elevation: widget.elevation ?? defaultAppButtonElevation,
+      animationDuration: const Duration(milliseconds: 300),
+      height: widget.height ?? 50,
+      disabledColor: widget.disabledColor,
+      focusColor: widget.focusColor,
+      hoverColor: widget.hoverColor,
+      splashColor: widget.splashColor,
+      child: widget.child ??
+          Text(
+            widget.text.validate(),
+            style: widget.textStyle ??
+                boldTextStyle(
+                  color: widget.textColor ?? defaultAppButtonTextColorGlobal,
+                  size: widget.size,
+                ),
+          ),
+    );
+
     return Padding(
       padding: widget.margin ?? .zero,
-      child: MaterialButton(
-        minWidth: widget.width,
-        padding: widget.padding ?? dynamicAppButtonPadding(context),
-        onPressed: widget.enabled.validate(value: true)
-            ? widget.onTap != null
-                ? widget.onTap as void Function()?
-                : null
-            : null,
-        color: widget.color ?? appButtonBackgroundColorGlobal,
-        shape: widget.shapeBorder ??
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-        elevation: widget.elevation ?? defaultAppButtonElevation,
-        animationDuration: const Duration(milliseconds: 300),
-        height: widget.height ?? 50,
-        disabledColor: widget.disabledColor,
-        focusColor: widget.focusColor,
-        hoverColor: widget.hoverColor,
-        splashColor: widget.splashColor,
-        child: widget.child ??
-            Text(
-              widget.text.validate(),
-              style: widget.textStyle ??
-                  boldTextStyle(
-                    color: widget.textColor ?? defaultAppButtonTextColorGlobal,
-                    size: widget.size,
-                  ),
-            ),
+      child: DecoratedBox(
+        decoration: useGradient
+            ? BoxDecoration(
+                gradient: ColorUtils.tealGradient,
+                borderRadius: gradientRadius,
+              )
+            : const BoxDecoration(),
+        child: button,
       ),
     );
   }

@@ -14,9 +14,7 @@ import '../../main/models/OrderListModel.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdfx/pdfx.dart';
-import 'package:pdfx/pdfx.dart' as pdf;
 
-import '../../extensions/app_button.dart';
 import '../../extensions/common.dart';
 import '../../extensions/decorations.dart';
 import '../../extensions/text_styles.dart';
@@ -42,224 +40,284 @@ class OrderCardComponent extends StatefulWidget {
 class _OrderCardComponentState extends State<OrderCardComponent> {
   @override
   Widget build(BuildContext context) {
+    final Color statusAccent = statusColor(widget.item.status.validate());
+
     return GestureDetector(
       onTap: () {
         OrderDetailScreen(orderId: widget.item.id.validate()).launch(context, pageRouteAnimation: PageRouteAnimation.SlideBottomTop, duration: 400.milliseconds);
       },
       child: Container(
         margin: .only(bottom: 16),
-        decoration: boxDecorationWithRoundedCorners(borderRadius: BorderRadius.circular(defaultRadius), border: Border.all(color: ColorUtils.colorPrimary.withValues(alpha:0.3)), backgroundColor: Colors.transparent),
-        padding: .all(12),
-        child: Column(
-          crossAxisAlignment: .start,
-          children: [
-            Row(
-              crossAxisAlignment: .start,
-              children: [
-                widget.item.date != null ? Text(DateFormat('dd MMM yyyy').format(DateTime.parse("${widget.item.date!}")) + " ${language.at.toLowerCase()} " + DateFormat('hh:mm a').format(DateTime.parse("${widget.item.date!}")), style: primaryTextStyle(size: 14)).expand() : SizedBox(),
-                Container(
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(6), border: Border.all(color: statusColor(widget.item.status.validate()).withValues(alpha:0.08))),
-                  padding: .symmetric(horizontal: 3, vertical: 3),
-                  child: Icon(Icons.navigation_outlined, color: ColorUtils.colorPrimary).center(),
-                ).paddingRight(10).onTap(() {
-                  openMap(double.parse(widget.item.pickupPoint!.latitude.validate()), double.parse(widget.item.pickupPoint!.longitude.validate()), double.parse(widget.item.deliveryPoint!.latitude.validate()), double.parse(widget.item.deliveryPoint!.longitude.validate()));
-                }).visible(widget.item.status != ORDER_DELIVERED),
-                Container(
-                  decoration: BoxDecoration(color: statusColor(widget.item.status.validate()).withValues(alpha:0.08), borderRadius: BorderRadius.circular(6)),
-                  padding: .symmetric(horizontal: 8, vertical: 6),
-                  child: Row(
-                    children: [
-                      Text(orderStatus(widget.item.status!), style: primaryTextStyle(size: 14, color: statusColor(widget.item.status.validate()))),
-                    ],
-                  ),
+        decoration: boxDecorationWithRoundedCorners(
+          borderRadius: BorderRadius.circular(defaultRadius),
+          border: Border.all(color: ColorUtils.colorPrimary.withValues(alpha: 0.10)),
+          backgroundColor: appStore.isDarkMode ? ColorUtils.cardDarkColor : context.cardColor,
+          boxShadow: defaultBoxShadow(
+            shadowColor: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 22,
+            spreadRadius: 0,
+            offset: const Offset(0, 8),
+          ),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(defaultRadius),
+          child: Column(
+            crossAxisAlignment: .start,
+            children: [
+              Container(
+                padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+                decoration: BoxDecoration(
+                  color: appStore.isDarkMode ? ColorUtils.scaffoldSecondaryDark : const Color(0xFFF3FBFB),
+                  border: Border(bottom: BorderSide(color: ColorUtils.borderColor.withValues(alpha: 0.45))),
                 ),
-              ],
-            ),
-            Text('${widget.item.orderTrackingId}', style: boldTextStyle(size: 12, color: ColorUtils.colorPrimary)),
-            8.height,
-            Row(
-              crossAxisAlignment: .start,
-              children: [
-                Container(
-                  decoration: boxDecorationWithRoundedCorners(borderRadius: BorderRadius.circular(8), border: Border.all(color: ColorUtils.borderColor, width: appStore.isDarkMode ? 0.2 : 1), backgroundColor: context.cardColor),
-                  padding: .all(8),
-                  child: Image.asset(parcelTypeIcon(widget.item.parcelType.validate()), height: 24, width: 24, color: ColorUtils.colorPrimary),
-                ),
-                8.width,
-                Column(
-                  crossAxisAlignment: .start,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(widget.item.parcelType.validate(), style: boldTextStyle(), maxLines: 1, overflow: TextOverflow.ellipsis),
-                    4.height,
-                    Row(
-                      children: [
-                        Text('# ${widget.item.id}', style: boldTextStyle(size: 14)).expand(),
-                        if (widget.item.status != ORDER_CANCELLED) Text(printAmount(widget.item.totalAmount ?? 0), style: boldTextStyle()),
-                      ],
+                    Container(
+                      decoration: boxDecorationWithRoundedCorners(
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: ColorUtils.borderColor, width: appStore.isDarkMode ? 0.2 : 1),
+                        backgroundColor: appStore.isDarkMode ? ColorUtils.scaffoldSecondaryDark : const Color(0xFFE8FFFC),
+                      ),
+                      padding: .all(10),
+                      child: Image.asset(parcelTypeIcon(widget.item.parcelType.validate()), height: 26, width: 26, color: ColorUtils.colorPrimary),
+                    ),
+                    12.width,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: .start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(widget.item.parcelType.validate(), style: boldTextStyle(size: 15), maxLines: 1, overflow: TextOverflow.ellipsis),
+                              ),
+                              Container(
+                                padding: .symmetric(horizontal: 10, vertical: 5),
+                                decoration: boxDecorationWithRoundedCorners(
+                                  borderRadius: BorderRadius.circular(14),
+                                  backgroundColor: statusAccent.withValues(alpha: appStore.isDarkMode ? 0.18 : 0.12),
+                                ),
+                                child: Text(orderStatus(widget.item.status.validate()), style: boldTextStyle(size: 11, color: statusAccent)),
+                              ),
+                            ],
+                          ),
+                          4.height,
+                          Text('${widget.item.orderTrackingId}', style: secondaryTextStyle(size: 13)),
+                          8.height,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              if (widget.item.date != null)
+                                Text(DateFormat('dd MMM yyyy, hh:mm a').format(DateTime.parse("${widget.item.date!}")), style: secondaryTextStyle(size: 12)),
+                              if (widget.item.status != ORDER_CANCELLED)
+                                Text(printAmount(widget.item.totalAmount ?? 0), style: boldTextStyle(size: 16, color: ColorUtils.colorPrimary)),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
-                ).expand(),
-              ],
-            ),
-            8.height,
-            Column(
-              crossAxisAlignment: .start,
-              children: [
-                Row(
-                  crossAxisAlignment: .start,
-                  children: [
-                    Column(
-                      crossAxisAlignment: .start,
-                      children: [
-                        if (widget.item.pickupDatetime != null)
-                          Column(
-                            crossAxisAlignment: .start,
-                            children: [
-                              Text(language.picked, style: secondaryTextStyle(size: 12)),
-                              4.height,
-                              Text('${language.at} ${printDateWithoutAt("${widget.item.pickupDatetime!}Z")}', style: secondaryTextStyle(size: 12)),
-                            ],
-                          ),
-                        4.height,
-                        GestureDetector(
-                          onTap: () {
-                            OrderDetailScreen(orderId: widget.item.id.validate()).launch(context, pageRouteAnimation: PageRouteAnimation.SlideBottomTop, duration: 400.milliseconds);
-                            // if (widget.item.status != ORDER_DELIVERED) {
-                            //   openMap(
-                            //       double.parse(widget.item.pickupPoint!.latitude.validate()),
-                            //       double.parse(widget.item.pickupPoint!.longitude.validate()),
-                            //       double.parse(widget.item.deliveryPoint!.latitude.validate()),
-                            //       double.parse(widget.item.deliveryPoint!.longitude.validate()));
-                            // } else {
-                            //   OrderDetailScreen(orderId: widget.item.id.validate()).launch(context,
-                            //       pageRouteAnimation: PageRouteAnimation.SlideBottomTop, duration: 400.milliseconds);
-                            // }
-                          },
-                          child: Row(
-                            children: [
-                              ImageIcon(AssetImage(ic_from), size: 24, color: ColorUtils.colorPrimary),
-                              12.width,
-                              Text('${widget.item.pickupPoint!.address}', style: primaryTextStyle()).expand(),
-                            ],
-                          ),
-                        ),
-                        if (widget.item.pickupDatetime == null && widget.item.pickupPoint!.endTime != null && widget.item.pickupPoint!.startTime != null)
-                          Text('${language.note} ${language.courierWillPickupAt} ${DateFormat('dd MMM yyyy').format(DateTime.parse(widget.item.pickupPoint!.startTime!).toLocal())} ${language.from} ${DateFormat('hh:mm').format(DateTime.parse(widget.item.pickupPoint!.startTime!).toLocal())} ${language.to} ${DateFormat('hh:mm').format(DateTime.parse(widget.item.pickupPoint!.endTime!).toLocal())}',
-                                  style: secondaryTextStyle(size: 12, color: Colors.red))
-                              .paddingOnly(top: 4)
-                              .paddingOnly(top: 4),
-                      ],
-                    ).expand(),
-                    12.width,
-                    if (widget.item.pickupPoint!.contactNumber != null && widget.item.status != COMPLETED)
-                      Icon(Ionicons.ios_call_outline, size: 20, color: ColorUtils.colorPrimary).onTap(() {
-                        commonLaunchUrl('tel:${widget.item.pickupPoint!.contactNumber}');
-                      }),
-                  ],
                 ),
-              ],
-            ),
-            16.height,
-            Column(
-              crossAxisAlignment: .start,
-              children: [
-                Row(
-                  crossAxisAlignment: .start,
+              ),
+
+              Container(
+                padding: .all(16),
+                child: Column(
                   children: [
-                    Column(
-                      crossAxisAlignment: .start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: .start,
-                          children: [
-                            if (widget.item.deliveryDatetime != null)
-                              Column(
-                                crossAxisAlignment: .start,
-                                children: [
-                                  Text(language.delivered, style: secondaryTextStyle(size: 12)),
-                                  4.height,
-                                  Text('${language.at} ${printDateWithoutAt("${widget.item.deliveryDatetime!}Z")}', style: secondaryTextStyle(size: 12)),
+                    _buildLocationRow(
+                      icon: ic_from,
+                      label: widget.item.pickupDatetime != null ? language.picked : language.picked,
+                      address: widget.item.pickupPoint!.address.validate(),
+                      dateTime: widget.item.pickupDatetime,
+                      startTime: widget.item.pickupPoint!.startTime,
+                      endTime: widget.item.pickupPoint!.endTime,
+                      contactNumber: widget.item.pickupPoint!.contactNumber,
+                      isPicked: widget.item.pickupDatetime != null,
+                      notePrefix: language.courierWillPickupAt,
+                    ),
+                    Container(
+                      margin: .only(left: 11, top: 8, bottom: 8),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 2,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  ColorUtils.colorPrimary.withValues(alpha: 0.30),
+                                  ColorUtils.colorPrimary.withValues(alpha: 0.08),
                                 ],
                               ),
-                            4.height,
-                            GestureDetector(
-                              onTap: () {
-                                OrderDetailScreen(orderId: widget.item.id.validate()).launch(context, pageRouteAnimation: PageRouteAnimation.SlideBottomTop, duration: 400.milliseconds);
-                              },
-                              child: Row(
-                                children: [
-                                  ImageIcon(AssetImage(ic_to), size: 24, color: ColorUtils.colorPrimary),
-                                  12.width,
-                                  Text('${widget.item.deliveryPoint!.address}', style: primaryTextStyle(), textAlign: TextAlign.start).expand(),
-                                ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    _buildLocationRow(
+                      icon: ic_to,
+                      label: widget.item.deliveryDatetime != null ? language.delivered : language.delivered,
+                      address: widget.item.deliveryPoint!.address.validate(),
+                      dateTime: widget.item.deliveryDatetime,
+                      startTime: widget.item.deliveryPoint!.startTime,
+                      endTime: widget.item.deliveryPoint!.endTime,
+                      contactNumber: widget.item.deliveryPoint!.contactNumber,
+                      isPicked: widget.item.deliveryDatetime != null,
+                      notePrefix: language.courierWillDeliverAt,
+                    ),
+                    if (widget.item.reScheduleDateTime != null)
+                      Container(
+                        margin: .only(top: 12),
+                        padding: .all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.schedule, size: 16, color: Colors.orange),
+                            8.width,
+                            Expanded(
+                              child: Text(
+                                '${language.rescheduleMsg} ${DateFormat('yyyy-MM-dd').format(DateTime.parse(widget.item.reScheduleDateTime!))}',
+                                style: secondaryTextStyle(size: 12, color: Colors.orange.shade700),
                               ),
                             ),
                           ],
                         ),
-                        if (widget.item.deliveryDatetime == null && widget.item.deliveryPoint!.endTime != null && widget.item.deliveryPoint!.startTime != null)
-                          Text('${language.note} ${language.courierWillDeliverAt} ${DateFormat('dd MMM yyyy').format(DateTime.parse(widget.item.deliveryPoint!.startTime!).toLocal())} ${language.from} ${DateFormat('hh:mm').format(DateTime.parse(widget.item.deliveryPoint!.startTime!).toLocal())} ${language.to} ${DateFormat('hh:mm').format(DateTime.parse(widget.item.deliveryPoint!.endTime!).toLocal())}',
-                                  style: secondaryTextStyle(color: Colors.red, size: 12))
-                              .paddingOnly(top: 4)
-                      ],
-                    ).expand(),
-                    12.width,
-                    if (widget.item.deliveryPoint!.contactNumber != null && widget.item.status != COMPLETED)
-                      Icon(Ionicons.ios_call_outline, size: 20, color: ColorUtils.colorPrimary).onTap(() {
-                        commonLaunchUrl('tel:${widget.item.deliveryPoint!.contactNumber}');
-                      }),
+                      ),
                   ],
                 ),
-                if (widget.item.reScheduleDateTime != null) Text('${language.note} ${language.rescheduleMsg} ${DateFormat('yyyy-MM-dd').format(DateTime.parse(widget.item.reScheduleDateTime!))} ', style: secondaryTextStyle(color: Colors.red, size: 12)).paddingOnly(top: 4)
-              ],
-            ),
-            if (widget.item.status != ORDER_CANCELLED || (widget.item.status == ORDER_DEPARTED || widget.item.status == ORDER_ACCEPTED)) 16.height,
-            Row(
-              mainAxisAlignment: .spaceBetween,
-              children: [
-                if (widget.item.status == ORDER_DELIVERED)
-                  Container(
-                    padding: .symmetric(horizontal: 12, vertical: 4),
-                    decoration: boxDecorationWithRoundedCorners(backgroundColor: ColorUtils.colorPrimary),
-                    child: Row(
-                      children: [
-                        Text(language.invoice, style: secondaryTextStyle(color: Colors.white)),
-                        4.width,
-                        Icon(Ionicons.md_download_outline, color: Colors.white, size: 18).paddingBottom(4),
-                      ],
-                    ).onTap(() {
-                      // generateInvoiceCall(widget.item);
-                      print("invice ${widget.item.invoice}");
-                      PDFViewer(
-                        invoice: "${widget.item.invoice.validate()}",
-                        filename: "${widget.item.id.validate()}",
-                      ).launch(context);
-                    }),
-                  ),
-                AppButton(
-                  elevation: 0,
-                  height: 35,
-                  color: Colors.transparent,
-                  padding: .symmetric(horizontal: 8),
-                  shapeBorder: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(defaultRadius),
-                    side: BorderSide(color: ColorUtils.colorPrimary),
-                  ),
+              ),
+
+              if (widget.item.status == ORDER_DELIVERED || (widget.item.status == ORDER_DEPARTED && appStore.userType != DELIVERY_MAN))
+                Container(
+                  padding: .only(left: 16, right: 16, bottom: 16),
                   child: Row(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(language.trackOrder, style: primaryTextStyle(color: ColorUtils.colorPrimary)),
-                      Icon(Icons.arrow_right, color: ColorUtils.colorPrimary),
+                      if ((widget.item.status == ORDER_DEPARTED) && appStore.userType != DELIVERY_MAN)
+                        Expanded(
+                          child: Container(
+                            height: 44,
+                            decoration: BoxDecoration(
+                              gradient: ColorUtils.tealGradient,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: .center,
+                              children: [
+                                Text(language.trackOrder, style: boldTextStyle(color: Colors.white, size: 14)),
+                                6.width,
+                                const Icon(Icons.arrow_forward, color: Colors.white, size: 18),
+                              ],
+                            ),
+                          ).onTap(() {
+                            OrderTrackingScreen(orderData: widget.item).launch(context);
+                          }),
+                        ),
+                      if (widget.item.status == ORDER_DELIVERED)
+                        Expanded(
+                          child: Container(
+                            height: 44,
+                            decoration: BoxDecoration(
+                              gradient: ColorUtils.tealGradient,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(color: ColorUtils.colorPrimary.withValues(alpha: 0.18), blurRadius: 14, offset: const Offset(0, 6)),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisAlignment: .center,
+                              children: [
+                                const Icon(Icons.description_outlined, color: Colors.white, size: 18),
+                                8.width,
+                                Text(language.invoice, style: boldTextStyle(color: Colors.white, size: 14)),
+                              ],
+                            ),
+                          ).onTap(() {
+                            PDFViewer(
+                              invoice: "${widget.item.invoice.validate()}",
+                              filename: "${widget.item.id.validate()}",
+                            ).launch(context);
+                          }),
+                        ),
+                      if (widget.item.status != ORDER_DELIVERED && widget.item.status != ORDER_CANCELLED && (widget.item.status == ORDER_DEPARTED && appStore.userType != DELIVERY_MAN))
+                        12.width,
+                      if (widget.item.status != ORDER_DELIVERED && widget.item.status != ORDER_CANCELLED)
+                        Container(
+                          height: 44,
+                          width: 44,
+                          decoration: BoxDecoration(
+                            color: ColorUtils.colorPrimary.withValues(alpha: 0.10),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(Icons.navigation, color: ColorUtils.veloxiTeal, size: 20).center(),
+                        ).onTap(() {
+                          openMap(
+                            double.parse(widget.item.pickupPoint!.latitude.validate()),
+                            double.parse(widget.item.pickupPoint!.longitude.validate()),
+                            double.parse(widget.item.deliveryPoint!.latitude.validate()),
+                            double.parse(widget.item.deliveryPoint!.longitude.validate()),
+                          );
+                        }),
                     ],
                   ),
-                  onTap: () {
-                    OrderTrackingScreen(orderData: widget.item).launch(context);
-                  },
-                ).visible((widget.item.status == ORDER_DEPARTED) && appStore.userType != DELIVERY_MAN),
-              ],
-            ),
-          ],
+                ),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLocationRow({
+    required String icon,
+    required String label,
+    required String address,
+    required String? dateTime,
+    required String? startTime,
+    required String? endTime,
+    required String? contactNumber,
+    required bool isPicked,
+    required String notePrefix,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ImageIcon(AssetImage(icon), size: 20, color: ColorUtils.colorPrimary),
+        12.width,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: secondaryTextStyle(size: 12)),
+              4.height,
+              Text(address, style: primaryTextStyle()).expand(),
+              if (dateTime != null)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    4.height,
+                    Text('${language.at} ${printDateWithoutAt("$dateTime")}', style: secondaryTextStyle(size: 12)),
+                  ],
+                ),
+              if (startTime != null && endTime != null && dateTime == null)
+                Text(
+                '${language.note} ${notePrefix} ${DateFormat('dd MMM yyyy').format(DateTime.parse(startTime).toLocal())} ${language.from} ${DateFormat('hh:mm').format(DateTime.parse(startTime).toLocal())} ${language.to} ${DateFormat('hh:mm').format(DateTime.parse(endTime).toLocal())}',
+                style: secondaryTextStyle(size: 12, color: Colors.red),
+              ).paddingOnly(top: 4),
+            ],
+          ),
+        ),
+        12.width,
+        if (contactNumber != null && widget.item.status != COMPLETED)
+          Icon(Ionicons.ios_call_outline, size: 20, color: ColorUtils.colorPrimary).onTap(() {
+            commonLaunchUrl('tel:$contactNumber');
+          }),
+      ],
     );
   }
 }
@@ -288,7 +346,7 @@ class _PDFViewerState extends State<PDFViewer> {
       setState(() {
         appStore.setLoading(true);
         print("invoice ==> ${widget.invoice}");
-        pdfController = PdfController(document: pdf.PdfDocument.openData(InternetFile.get("${widget.invoice}")));
+        pdfController = PdfController(document: PdfDocument.openData(InternetFile.get("${widget.invoice}")));
         appStore.setLoading(false);
       });
     } catch (e) {

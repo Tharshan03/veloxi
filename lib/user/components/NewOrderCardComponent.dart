@@ -16,6 +16,7 @@ import 'package:pdfx/pdfx.dart';
 import 'package:pdfx/pdfx.dart' as pdf;
 
 import '../../extensions/common.dart';
+import '../../extensions/decorations.dart';
 import '../../extensions/text_styles.dart';
 import '../../main.dart';
 import '../../main/utils/Common.dart';
@@ -39,6 +40,8 @@ class NewOrderCardComponent extends StatefulWidget {
 class _NewOrderCardComponentState extends State<NewOrderCardComponent> {
   @override
   Widget build(BuildContext context) {
+    final Color statusAccent = statusColor(widget.item.status.validate());
+
     return GestureDetector(
       onTap: () {
         OrderDetailScreen(orderId: widget.item.id.validate())
@@ -46,285 +49,230 @@ class _NewOrderCardComponentState extends State<NewOrderCardComponent> {
       },
       child: Container(
         margin: .only(bottom: 16),
-        decoration: BoxDecoration(
-          color: context.cardColor,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha:0.04),
-              blurRadius: 12,
-              offset: Offset(0, 4),
-            ),
-          ],
+        decoration: boxDecorationWithRoundedCorners(
+          borderRadius: BorderRadius.circular(defaultRadius),
+          border: Border.all(color: ColorUtils.colorPrimary.withValues(alpha: 0.10)),
+          backgroundColor: appStore.isDarkMode ? ColorUtils.cardDarkColor : context.cardColor,
+          boxShadow: defaultBoxShadow(
+            shadowColor: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 22,
+            spreadRadius: 0,
+            offset: const Offset(0, 8),
+          ),
         ),
-        child: Column(
-          crossAxisAlignment: .start,
-          children: [
-            // Header Section
-            Container(
-              padding: .all(16),
-              decoration: BoxDecoration(
-                color: ColorUtils.colorPrimary.withValues(alpha:0.05),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(defaultRadius),
+          child: Column(
+            crossAxisAlignment: .start,
+            children: [
+              Container(
+                padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+                decoration: BoxDecoration(
+                  color: appStore.isDarkMode ? ColorUtils.scaffoldSecondaryDark : const Color(0xFFF3FBFB),
+                  border: Border(bottom: BorderSide(color: ColorUtils.borderColor.withValues(alpha: 0.45))),
                 ),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      // Parcel Icon
-                      Container(
-                        height: 48,
-                        width: 48,
-                        decoration: BoxDecoration(
-                          color: ColorUtils.colorPrimary.withValues(alpha:0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Image.asset(
-                          parcelTypeIcon(widget.item.parcelType.validate()),
-                          height: 24,
-                          width: 24,
-                          color: ColorUtils.colorPrimary,
-                        ).center(),
-                      ),
-                      12.width,
-                      // Order Info
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: .start,
-                          children: [
-                            Text(
-                              widget.item.parcelType.validate(),
-                              style: boldTextStyle(size: 15),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            4.height,
-                            Text(
-                              '${widget.item.orderTrackingId}',
-                              style: secondaryTextStyle(size: 13),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Status Badge
-                      Container(
-                        padding: .symmetric(horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: statusColor(widget.item.status.validate()).withValues(alpha:0.12),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          orderStatus(widget.item.status!),
-                          style: boldTextStyle(
-                            size: 12,
-                            color: statusColor(widget.item.status.validate()),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  12.height,
-                  // Date and Amount Row
-                  Row(
-                    mainAxisAlignment: .spaceBetween,
-                    children: [
-                      if (widget.item.date != null)
-                        Row(
-                          children: [
-                            Icon(Icons.access_time, size: 14, color: ColorUtils.colorPrimary.withValues(alpha:0.6)),
-                            6.width,
-                            Text(
-                              DateFormat('dd MMM yyyy, hh:mm a').format(DateTime.parse("${widget.item.date!}")),
-                              style: secondaryTextStyle(size: 12),
-                            ),
-                          ],
-                        ),
-                      if (widget.item.status != ORDER_CANCELLED)
-                        Text(
-                          printAmount(widget.item.totalAmount ?? 0),
-                          style: boldTextStyle(size: 16, color: ColorUtils.colorPrimary),
-                        ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            // Location Details
-            Container(
-              padding: .all(16),
-              child: Column(
-                children: [
-                  // Pickup Location
-                  _buildLocationRow(
-                    icon: ic_from,
-                    label: widget.item.pickupDatetime != null ? language.picked : language.picked,
-                    address: widget.item.pickupPoint!.address.validate(),
-                    dateTime: widget.item.pickupDatetime,
-                    startTime: widget.item.pickupPoint!.startTime,
-                    endTime: widget.item.pickupPoint!.endTime,
-                    contactNumber: widget.item.pickupPoint!.contactNumber,
-                    isPicked: widget.item.pickupDatetime != null,
-                    notePrefix: language.courierWillPickupAt,
-                  ),
-
-                  // Connection Line
-                  Container(
-                    margin: .only(left: 11, top: 8, bottom: 8),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 2,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                ColorUtils.colorPrimary.withValues(alpha:0.3),
-                                ColorUtils.colorPrimary.withValues(alpha:0.1),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Delivery Location
-                  _buildLocationRow(
-                    icon: ic_to,
-                    label: widget.item.deliveryDatetime != null ? language.delivered : language.delivered,
-                    address: widget.item.deliveryPoint!.address.validate(),
-                    dateTime: widget.item.deliveryDatetime,
-                    startTime: widget.item.deliveryPoint!.startTime,
-                    endTime: widget.item.deliveryPoint!.endTime,
-                    contactNumber: widget.item.deliveryPoint!.contactNumber,
-                    isPicked: widget.item.deliveryDatetime != null,
-                    notePrefix: language.courierWillDeliverAt,
-                  ),
-
-                  // Reschedule Notice
-                  if (widget.item.reScheduleDateTime != null)
+                child: Row(
+                  children: [
                     Container(
-                      margin: .only(top: 12),
-                      padding: .all(12),
+                      height: 48,
+                      width: 48,
                       decoration: BoxDecoration(
-                        color: Colors.orange.withValues(alpha:0.08),
-                        borderRadius: BorderRadius.circular(8),
+                        color: ColorUtils.colorPrimary.withValues(alpha: 0.10),
+                        borderRadius: BorderRadius.circular(14),
                       ),
-                      child: Row(
+                      child: Image.asset(
+                        parcelTypeIcon(widget.item.parcelType.validate()),
+                        height: 24,
+                        width: 24,
+                        color: ColorUtils.colorPrimary,
+                      ).center(),
+                    ),
+                    12.width,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: .start,
                         children: [
-                          Icon(Icons.schedule, size: 16, color: Colors.orange),
-                          8.width,
-                          Expanded(
-                            child: Text(
-                              '${language.rescheduleMsg} ${DateFormat('yyyy-MM-dd').format(DateTime.parse(widget.item.reScheduleDateTime!))}',
-                              style: secondaryTextStyle(size: 12, color: Colors.orange.shade700),
-                            ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(widget.item.parcelType.validate(), style: boldTextStyle(size: 15), maxLines: 1, overflow: TextOverflow.ellipsis),
+                              ),
+                              Container(
+                                padding: .symmetric(horizontal: 10, vertical: 5),
+                                decoration: boxDecorationWithRoundedCorners(
+                                  borderRadius: BorderRadius.circular(14),
+                                  backgroundColor: statusAccent.withValues(alpha: appStore.isDarkMode ? 0.18 : 0.12),
+                                ),
+                                child: Text(orderStatus(widget.item.status.validate()), style: boldTextStyle(size: 11, color: statusAccent)),
+                              ),
+                            ],
+                          ),
+                          4.height,
+                          Text('${widget.item.orderTrackingId}', style: secondaryTextStyle(size: 13)),
+                          8.height,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              if (widget.item.date != null)
+                                Row(
+                                  children: [
+                                    Icon(Icons.access_time, size: 14, color: ColorUtils.colorPrimary.withValues(alpha: 0.6)),
+                                    6.width,
+                                    Text(DateFormat('dd MMM yyyy, hh:mm a').format(DateTime.parse("${widget.item.date!}")), style: secondaryTextStyle(size: 12)),
+                                  ],
+                                ),
+                              if (widget.item.status != ORDER_CANCELLED)
+                                Text(printAmount(widget.item.totalAmount ?? 0), style: boldTextStyle(size: 16, color: ColorUtils.colorPrimary)),
+                            ],
                           ),
                         ],
                       ),
                     ),
-                ],
-              ),
-            ),
-
-            // Action Buttons
-            if (widget.item.status == ORDER_DELIVERED ||
-                (widget.item.status == ORDER_DEPARTED && appStore.userType != DELIVERY_MAN) ||
-                widget.item.status != ORDER_CANCELLED)
-              Container(
-                padding: .only(left: 16, right: 16, bottom: 16),
-                child: Row(
-                  children: [
-                    // Track Order Button
-                    if ((widget.item.status == ORDER_DEPARTED) && appStore.userType != DELIVERY_MAN)
-                      Expanded(
-                        child: Container(
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: ColorUtils.colorPrimary,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: .center,
-                            children: [
-                              Text(
-                                language.trackOrder,
-                                style: boldTextStyle(color: Colors.white, size: 14),
-                              ),
-                              6.width,
-                              Icon(Icons.arrow_forward, color: Colors.white, size: 18),
-                            ],
-                          ),
-                        ).onTap(() {
-                          OrderTrackingScreen(orderData: widget.item).launch(context);
-                        }),
-                      ),
-
-                    // Invoice Button
-                    if (widget.item.status == ORDER_DELIVERED)
-                      Expanded(
-                        child: Container(
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: ColorUtils.colorPrimary,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: .center,
-                            children: [
-                              Icon(Icons.description_outlined, color: Colors.white, size: 18),
-                              8.width,
-                              Text(
-                                language.invoice,
-                                style: boldTextStyle(color: Colors.white, size: 14),
-                              ),
-                            ],
-                          ),
-                        ).onTap(() {
-                          PDFViewer(
-                            invoice: "${widget.item.invoice.validate()}",
-                            filename: "${widget.item.id.validate()}",
-                          ).launch(context);
-                        }),
-                      ),
-
-                    // Navigation Button
-                    if (widget.item.status != ORDER_DELIVERED &&
-                        widget.item.status != ORDER_CANCELLED &&
-                        (widget.item.status == ORDER_DEPARTED && appStore.userType != DELIVERY_MAN))
-                      12.width,
-
-                    if (widget.item.status != ORDER_DELIVERED && widget.item.status != ORDER_CANCELLED)
-                      Container(
-                        height: 44,
-                        width: 44,
-                        decoration: BoxDecoration(
-                          color: ColorUtils.colorPrimary.withValues(alpha:0.1),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(
-                          Icons.navigation,
-                          color: ColorUtils.colorPrimary,
-                          size: 20,
-                        ).center(),
-                      ).onTap(() {
-                        openMap(
-                          double.parse(widget.item.pickupPoint!.latitude.validate()),
-                          double.parse(widget.item.pickupPoint!.longitude.validate()),
-                          double.parse(widget.item.deliveryPoint!.latitude.validate()),
-                          double.parse(widget.item.deliveryPoint!.longitude.validate()),
-                        );
-                      }),
                   ],
                 ),
               ),
-          ],
+
+              Container(
+                padding: .all(16),
+                child: Column(
+                  children: [
+                    _buildLocationRow(
+                      icon: ic_from,
+                      label: widget.item.pickupDatetime != null ? language.picked : language.picked,
+                      address: widget.item.pickupPoint!.address.validate(),
+                      dateTime: widget.item.pickupDatetime,
+                      startTime: widget.item.pickupPoint!.startTime,
+                      endTime: widget.item.pickupPoint!.endTime,
+                      contactNumber: widget.item.pickupPoint!.contactNumber,
+                      isPicked: widget.item.pickupDatetime != null,
+                      notePrefix: language.courierWillPickupAt,
+                    ),
+                    Container(
+                      margin: .only(left: 11, top: 8, bottom: 8),
+                      width: 2,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            ColorUtils.colorPrimary.withValues(alpha: 0.30),
+                            ColorUtils.colorPrimary.withValues(alpha: 0.08),
+                          ],
+                        ),
+                      ),
+                    ),
+                    _buildLocationRow(
+                      icon: ic_to,
+                      label: widget.item.deliveryDatetime != null ? language.delivered : language.delivered,
+                      address: widget.item.deliveryPoint!.address.validate(),
+                      dateTime: widget.item.deliveryDatetime,
+                      startTime: widget.item.deliveryPoint!.startTime,
+                      endTime: widget.item.deliveryPoint!.endTime,
+                      contactNumber: widget.item.deliveryPoint!.contactNumber,
+                      isPicked: widget.item.deliveryDatetime != null,
+                      notePrefix: language.courierWillDeliverAt,
+                    ),
+                    if (widget.item.reScheduleDateTime != null)
+                      Container(
+                        margin: .only(top: 12),
+                        padding: .all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.schedule, size: 16, color: Colors.orange),
+                            8.width,
+                            Expanded(
+                              child: Text(
+                                '${language.rescheduleMsg} ${DateFormat('yyyy-MM-dd').format(DateTime.parse(widget.item.reScheduleDateTime!))}',
+                                style: secondaryTextStyle(size: 12, color: Colors.orange.shade700),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+
+              if (widget.item.status == ORDER_DELIVERED || (widget.item.status == ORDER_DEPARTED && appStore.userType != DELIVERY_MAN) || widget.item.status != ORDER_CANCELLED)
+                Container(
+                  padding: .only(left: 16, right: 16, bottom: 16),
+                  child: Row(
+                    children: [
+                      if ((widget.item.status == ORDER_DEPARTED) && appStore.userType != DELIVERY_MAN)
+                        Expanded(
+                          child: Container(
+                            height: 44,
+                            decoration: BoxDecoration(
+                              gradient: ColorUtils.tealGradient,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: .center,
+                              children: [
+                                Text(language.trackOrder, style: boldTextStyle(color: Colors.white, size: 14)),
+                                6.width,
+                                const Icon(Icons.arrow_forward, color: Colors.white, size: 18),
+                              ],
+                            ),
+                          ).onTap(() {
+                            OrderTrackingScreen(orderData: widget.item).launch(context);
+                          }),
+                        ),
+                      if (widget.item.status == ORDER_DELIVERED)
+                        Expanded(
+                          child: Container(
+                            height: 44,
+                            decoration: BoxDecoration(
+                              gradient: ColorUtils.tealGradient,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(color: ColorUtils.colorPrimary.withValues(alpha: 0.18), blurRadius: 14, offset: const Offset(0, 6)),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisAlignment: .center,
+                              children: [
+                                const Icon(Icons.description_outlined, color: Colors.white, size: 18),
+                                8.width,
+                                Text(language.invoice, style: boldTextStyle(color: Colors.white, size: 14)),
+                              ],
+                            ),
+                          ).onTap(() {
+                            PDFViewer(
+                              invoice: "${widget.item.invoice.validate()}",
+                              filename: "${widget.item.id.validate()}",
+                            ).launch(context);
+                          }),
+                        ),
+                      if (widget.item.status != ORDER_DELIVERED && widget.item.status != ORDER_CANCELLED && (widget.item.status == ORDER_DEPARTED && appStore.userType != DELIVERY_MAN))
+                        12.width,
+                      if (widget.item.status != ORDER_DELIVERED && widget.item.status != ORDER_CANCELLED)
+                        Container(
+                          height: 44,
+                          width: 44,
+                          decoration: BoxDecoration(
+                            color: ColorUtils.colorPrimary.withValues(alpha: 0.10),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(Icons.navigation, color: ColorUtils.veloxiTeal, size: 20).center(),
+                        ).onTap(() {
+                          openMap(
+                            double.parse(widget.item.pickupPoint!.latitude.validate()),
+                            double.parse(widget.item.pickupPoint!.longitude.validate()),
+                            double.parse(widget.item.deliveryPoint!.latitude.validate()),
+                            double.parse(widget.item.deliveryPoint!.longitude.validate()),
+                          );
+                        }),
+                    ],
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

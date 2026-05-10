@@ -25,6 +25,7 @@ import '../../main/utils/Constants.dart';
 import '../../user/screens/DashboardScreen.dart';
 import '../utils/Common.dart';
 import '../utils/Images.dart';
+import '../utils/dynamic_theme.dart';
 import 'UserCitySelectScreen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -86,8 +87,10 @@ class SplashScreenState extends State<SplashScreen> {
     // Language version update is giving issues
     await getLanguageList("")
         .then((value) {
-      appStore.setThemeColor(value.themeColor!);
-      appStore.updateTheme(colorFromHex(value.themeColor!));
+      // Veloxi design system: palette teal fixe, couleur serveur ignorée
+      const String veloxiPrimary = ColorUtils.veloxiPrimaryHex;
+      appStore.setThemeColor(veloxiPrimary);
+      appStore.updateTheme(colorFromHex(veloxiPrimary));
       appStore.setIsAllowDeliveryMan(value.isAllowDeliveryMan ?? false);
       appStore.setLoading(false);
       if (value.status == true) {
