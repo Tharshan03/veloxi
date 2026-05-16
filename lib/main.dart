@@ -31,7 +31,6 @@ import 'main/services/UserServices.dart';
 import 'main/store/AppStore.dart';
 import 'main/utils/Colors.dart';
 import 'main/utils/Common.dart';
-import 'main/utils/firebase_options.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 late SharedPreferences sharedPreferences;
@@ -230,7 +229,8 @@ class MyAppState extends State<MyApp> {
           ],
           localeResolutionCallback: (locale, supportedLocales) => locale,
           locale: Locale(
-            appStore.selectedLanguage.validate(value: defaultLanguageCode),
+            appStore.selectedLanguage.validate(
+              value: defaultLanguageCode),
           ),
         );
       },

@@ -48,244 +48,384 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
 
   getBankDetail() async {
     appStore.setLoading(true);
-    await getUserDetail(widget.userData!.id.validate()).then((value) {
-      appStore.setLoading(false);
-      if (value.userBankAccount != null) {
-        bankNameCon = value.userBankAccount!.bankName.validate();
-        accNumberCon = value.userBankAccount!.accountNumber.validate();
-        nameCon = value.userBankAccount!.accountHolderName.validate();
-        ifscCCon = value.userBankAccount!.bankCode.validate();
-        setState(() {});
-      }
-    }).then((value) {
-      appStore.setLoading(false);
-    });
+    await getUserDetail(widget.userData!.id.validate())
+        .then((value) {
+          appStore.setLoading(false);
+          if (value.userBankAccount != null) {
+            bankNameCon = value.userBankAccount!.bankName.validate();
+            accNumberCon = value.userBankAccount!.accountNumber.validate();
+            nameCon = value.userBankAccount!.accountHolderName.validate();
+            ifscCCon = value.userBankAccount!.bankCode.validate();
+            setState(() {});
+          }
+        })
+        .then((value) {
+          appStore.setLoading(false);
+        });
   }
 
   getWalletData() async {
     appStore.setLoading(true);
-    await getWalletList(page: 1).then((value) {
-      appStore.setLoading(false);
-      onlineReceived = value.walletBalance!.onlineReceived.toString();
-      totalAmount = value.walletBalance!.totalAmount.toString();
-      totalWithdrawn = value.walletBalance!.totalWithdrawn.toString();
-      manualReceived = value.walletBalance!.manualReceived.toString();
-      setState(() {});
-    }).catchError((error) {
-      appStore.setLoading(false);
-      log(error.toString());
-    });
+    await getWalletList(page: 1)
+        .then((value) {
+          appStore.setLoading(false);
+          onlineReceived = value.walletBalance!.onlineReceived.toString();
+          totalAmount = value.walletBalance!.totalAmount.toString();
+          totalWithdrawn = value.walletBalance!.totalWithdrawn.toString();
+          manualReceived = value.walletBalance!.manualReceived.toString();
+          setState(() {});
+        })
+        .catchError((error) {
+          appStore.setLoading(false);
+          log(error.toString());
+        });
   }
 
   getAddress() async {
-    final currentAddress =
-        await GeoCode().reverseGeocoding(latitude: widget.userData!.latitude.toDouble(), longitude: widget.userData!.longitude.toDouble());
-    addressValue = "${currentAddress.streetNumber},${currentAddress.region},${currentAddress.postal},${currentAddress.countryName}";
+    final currentAddress = await GeoCode().reverseGeocoding(
+      latitude: widget.userData!.latitude.toDouble(),
+      longitude: widget.userData!.longitude.toDouble(),
+    );
+    addressValue =
+        "${currentAddress.streetNumber},${currentAddress.region},${currentAddress.postal},${currentAddress.countryName}";
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return CommonScaffoldComponent(
-        appBarTitle: '${widget.userData != null ? widget.userData!.name!.capitalizeFirstLetter() : ''}',
-        body: Stack(children: [
+      appBarTitle:
+          '${widget.userData != null ? widget.userData!.name!.capitalizeFirstLetter() : ''}',
+      body: Stack(
+        children: [
           widget.userData != null
-              ? Stack(children: [
-                  AnimatedScrollView(
-                    padding: .only(left: 16, right: 16, top: 16, bottom: 100),
-                    children: [
-                      if (widget.userData != null)
-                        Column(
-                          crossAxisAlignment: .start,
-                          children: [
-                            16.height,
-                            Text(language.profile, style: boldTextStyle(size: 16)),
-                            12.height,
-                            Container(
-                              decoration: boxDecorationWithRoundedCorners(
-                                  borderRadius: BorderRadius.circular(defaultRadius),
-                                  border: Border.all(color: ColorUtils.colorPrimary.withValues(alpha:0.3)),
-                                  backgroundColor: Colors.transparent),
-                              padding: .all(12),
-                              child: Column(
-                                mainAxisAlignment: .start,
-                                crossAxisAlignment: .start,
-                                children: [
-                                  Row(
-                                    crossAxisAlignment: .start,
-                                    children: [
-                                      GestureDetector(
+              ? Stack(
+                  children: [
+                    AnimatedScrollView(
+                      padding: .only(left: 16, right: 16, top: 16, bottom: 100),
+                      children: [
+                        if (widget.userData != null)
+                          Column(
+                            crossAxisAlignment: .start,
+                            children: [
+                              16.height,
+                              Text(
+                                language.profile,
+                                style: boldTextStyle(size: 16),
+                              ),
+                              12.height,
+                              Container(
+                                decoration: boxDecorationWithRoundedCorners(
+                                  borderRadius: BorderRadius.circular(
+                                    defaultRadius,
+                                  ),
+                                  border: Border.all(
+                                    color: ColorUtils.colorPrimary.withValues(
+                                      alpha: 0.3,
+                                    ),
+                                  ),
+                                  backgroundColor: Colors.transparent,
+                                ),
+                                padding: .all(12),
+                                child: Column(
+                                  mainAxisAlignment: .start,
+                                  crossAxisAlignment: .start,
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment: .start,
+                                      children: [
+                                        GestureDetector(
                                           onTap: () {
-                                            UserDetailsScreen(userData: widget.userData).launch(context);
+                                            UserDetailsScreen(
+                                              userData: widget.userData,
+                                            ).launch(context);
                                           },
-                                          child: Image.network(widget.userData!.profileImage.validate(),
-                                                  height: 60, width: 60, fit: BoxFit.cover, alignment: Alignment.center)
-                                              .cornerRadiusWithClipRRect(60)),
-                                      8.width,
-                                      Column(
-                                        crossAxisAlignment: .start,
-                                        mainAxisAlignment: .start,
-                                        children: [
-                                          Text(widget.userData!.name.validate(), style: secondaryTextStyle(size: 14)),
-                                          4.height,
-                                          Text(widget.userData!.email.validate(), style: secondaryTextStyle(size: 14)),
-                                          4.height,
-                                          Text(widget.userData!.contactNumber.validate(), style: secondaryTextStyle(size: 14)),
-                                        ],
-                                      ).expand(),
+                                          child: Image.network(
+                                            widget.userData!.profileImage
+                                                .validate(),
+                                            height: 60,
+                                            width: 60,
+                                            fit: BoxFit.cover,
+                                            alignment: Alignment.center,
+                                          ).cornerRadiusWithClipRRect(60),
+                                        ),
+                                        8.width,
+                                        Column(
+                                          crossAxisAlignment: .start,
+                                          mainAxisAlignment: .start,
+                                          children: [
+                                            Text(
+                                              widget.userData!.name.validate(),
+                                              style: secondaryTextStyle(
+                                                size: 14,
+                                              ),
+                                            ),
+                                            4.height,
+                                            Text(
+                                              widget.userData!.email.validate(),
+                                              style: secondaryTextStyle(
+                                                size: 14,
+                                              ),
+                                            ),
+                                            4.height,
+                                            Text(
+                                              widget.userData!.contactNumber
+                                                  .validate(),
+                                              style: secondaryTextStyle(
+                                                size: 14,
+                                              ),
+                                            ),
+                                          ],
+                                        ).expand(),
 
-                                      //  .visible(orderData!.status != ORDER_DELIVERED && orderData!.status != ORDER_CANCELLED && userData!.userType!=ADMIN && userData!.userType!=DEMO_ADMIN)
-                                    ],
-                                  ),
-                                ],
+                                        //  .visible(orderData!.status != ORDER_DELIVERED && orderData!.status != ORDER_CANCELLED && userData!.userType!=ADMIN && userData!.userType!=DEMO_ADMIN)
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            16.height,
-                            Text(language.bankDetails, style: boldTextStyle(size: 16)),
-                            12.height,
-                            Container(
-                              decoration: boxDecorationWithRoundedCorners(
-                                  borderRadius: BorderRadius.circular(defaultRadius),
-                                  border: Border.all(color: ColorUtils.colorPrimary.withValues(alpha:0.3)),
-                                  backgroundColor: Colors.transparent),
-                              padding: .all(12),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: .spaceBetween,
-                                    children: [
-                                      Text(language.bankName, style: secondaryTextStyle()),
-                                      Text(bankNameCon.validate(), style: primaryTextStyle(size: 14)),
-                                    ],
-                                  ),
-                                  8.height,
-                                  Row(
-                                    mainAxisAlignment: .spaceBetween,
-                                    children: [
-                                      Text(language.accountNumber, style: secondaryTextStyle()),
-                                      Text(accNumberCon.validate(), style: primaryTextStyle(size: 14)),
-                                    ],
-                                  ),
-                                  8.height,
-                                  Row(
-                                    mainAxisAlignment: .spaceBetween,
-                                    children: [
-                                      Text(language.nameAsPerBank, style: secondaryTextStyle()),
-                                      Text(nameCon.validate(), style: primaryTextStyle(size: 14)),
-                                    ],
-                                  ),
-                                  8.height,
-                                  Row(
-                                    mainAxisAlignment: .spaceBetween,
-                                    children: [
-                                      Text(language.ifscCode, style: secondaryTextStyle()),
-                                      Text(ifscCCon.validate(), style: primaryTextStyle(size: 14)),
-                                    ],
-                                  ),
-                                ],
+                              16.height,
+                              Text(
+                                language.bankDetails,
+                                style: boldTextStyle(size: 16),
                               ),
-                            ),
-                            12.height,
-                            Text(language.earningHistory, style: boldTextStyle(size: 16)),
-                            12.height,
-                            Container(
-                              decoration: boxDecorationWithRoundedCorners(
-                                  borderRadius: BorderRadius.circular(defaultRadius),
-                                  border: Border.all(color: ColorUtils.colorPrimary.withValues(alpha:0.3)),
-                                  backgroundColor: Colors.transparent),
-                              padding: .all(12),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: .spaceBetween,
-                                    children: [
-                                      Text(language.availableBalance, style: secondaryTextStyle()),
-                                      Text(totalAmount.validate(), style: primaryTextStyle(size: 14)),
-                                    ],
+                              12.height,
+                              Container(
+                                decoration: boxDecorationWithRoundedCorners(
+                                  borderRadius: BorderRadius.circular(
+                                    defaultRadius,
                                   ),
-                                  8.height,
-                                  Row(
-                                    mainAxisAlignment: .spaceBetween,
-                                    children: [
-                                      Text(language.manualRecieved, style: secondaryTextStyle()),
-                                      Text(manualReceived.toString().validate(), style: primaryTextStyle(size: 14)),
-                                    ],
+                                  border: Border.all(
+                                    color: ColorUtils.colorPrimary.withValues(
+                                      alpha: 0.3,
+                                    ),
                                   ),
-                                  8.height,
-                                  Row(
-                                    mainAxisAlignment: .spaceBetween,
-                                    children: [
-                                      Text(language.totalWithdrawn, style: secondaryTextStyle()),
-                                      Text(totalWithdrawn.validate(), style: primaryTextStyle(size: 14)),
-                                    ],
-                                  ),
-                                  8.height,
-                                  Row(
-                                    mainAxisAlignment: .spaceBetween,
-                                    children: [
-                                      Text(language.totalWithdrawn, style: secondaryTextStyle()),
-                                      Text(totalWithdrawn.validate(), style: primaryTextStyle(size: 14)),
-                                    ],
-                                  ),
-                                ],
+                                  backgroundColor: Colors.transparent,
+                                ),
+                                padding: .all(12),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: .spaceBetween,
+                                      children: [
+                                        Text(
+                                          language.bankName,
+                                          style: secondaryTextStyle(),
+                                        ),
+                                        Text(
+                                          bankNameCon.validate(),
+                                          style: primaryTextStyle(size: 14),
+                                        ),
+                                      ],
+                                    ),
+                                    8.height,
+                                    Row(
+                                      mainAxisAlignment: .spaceBetween,
+                                      children: [
+                                        Text(
+                                          language.accountNumber,
+                                          style: secondaryTextStyle(),
+                                        ),
+                                        Text(
+                                          accNumberCon.validate(),
+                                          style: primaryTextStyle(size: 14),
+                                        ),
+                                      ],
+                                    ),
+                                    8.height,
+                                    Row(
+                                      mainAxisAlignment: .spaceBetween,
+                                      children: [
+                                        Text(
+                                          language.nameAsPerBank,
+                                          style: secondaryTextStyle(),
+                                        ),
+                                        Text(
+                                          nameCon.validate(),
+                                          style: primaryTextStyle(size: 14),
+                                        ),
+                                      ],
+                                    ),
+                                    8.height,
+                                    Row(
+                                      mainAxisAlignment: .spaceBetween,
+                                      children: [
+                                        Text(
+                                          language.ifscCode,
+                                          style: secondaryTextStyle(),
+                                        ),
+                                        Text(
+                                          ifscCCon.validate(),
+                                          style: primaryTextStyle(size: 14),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            12.height,
-                            Text(language.lastLocation, style: boldTextStyle(size: 16)),
-                            12.height,
-                            Container(
-                              decoration: boxDecorationWithRoundedCorners(
-                                  borderRadius: BorderRadius.circular(defaultRadius),
-                                  border: Border.all(color: ColorUtils.colorPrimary.withValues(alpha:0.3)),
-                                  backgroundColor: Colors.transparent),
-                              padding: .all(12),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: .spaceBetween,
-                                    children: [
-                                      Text(language.latitude, style: secondaryTextStyle()),
-                                      Text(widget.userData!.latitude.toString(), style: primaryTextStyle(size: 14)),
-                                    ],
+                              12.height,
+                              Text(
+                                language.earningHistory,
+                                style: boldTextStyle(size: 16),
+                              ),
+                              12.height,
+                              Container(
+                                decoration: boxDecorationWithRoundedCorners(
+                                  borderRadius: BorderRadius.circular(
+                                    defaultRadius,
                                   ),
-                                  8.height,
-                                  Row(
-                                    mainAxisAlignment: .spaceBetween,
-                                    children: [
-                                      Text(language.longitude, style: secondaryTextStyle()),
-                                      Text(widget.userData!.longitude.toString(), style: primaryTextStyle(size: 14)),
-                                    ],
+                                  border: Border.all(
+                                    color: ColorUtils.colorPrimary.withValues(
+                                      alpha: 0.3,
+                                    ),
                                   ),
-                                  8.height,
-                                  Row(
-                                    mainAxisAlignment: .spaceBetween,
-                                    //   crossAxisAlignment: .end,
-                                    children: [
-                                      Text(language.address, style: secondaryTextStyle()),
-                                      Container(
-                                        width: context.width() * 0.5,
-                                        child: Align(
-                                          alignment: Alignment.centerRight,
-                                          child: Text(
-                                            addressValue,
-                                            textAlign: TextAlign.start,
-                                            style: secondaryTextStyle(),
-                                            maxLines: 3,
-                                            overflow: TextOverflow.ellipsis,
+                                  backgroundColor: Colors.transparent,
+                                ),
+                                padding: .all(12),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: .spaceBetween,
+                                      children: [
+                                        Text(
+                                          language.availableBalance,
+                                          style: secondaryTextStyle(),
+                                        ),
+                                        Text(
+                                          totalAmount.validate(),
+                                          style: primaryTextStyle(size: 14),
+                                        ),
+                                      ],
+                                    ),
+                                    8.height,
+                                    Row(
+                                      mainAxisAlignment: .spaceBetween,
+                                      children: [
+                                        Text(
+                                          language.manualRecieved,
+                                          style: secondaryTextStyle(),
+                                        ),
+                                        Text(
+                                          manualReceived.toString().validate(),
+                                          style: primaryTextStyle(size: 14),
+                                        ),
+                                      ],
+                                    ),
+                                    8.height,
+                                    Row(
+                                      mainAxisAlignment: .spaceBetween,
+                                      children: [
+                                        Text(
+                                          language.totalWithdrawn,
+                                          style: secondaryTextStyle(),
+                                        ),
+                                        Text(
+                                          totalWithdrawn.validate(),
+                                          style: primaryTextStyle(size: 14),
+                                        ),
+                                      ],
+                                    ),
+                                    8.height,
+                                    Row(
+                                      mainAxisAlignment: .spaceBetween,
+                                      children: [
+                                        Text(
+                                          language.totalWithdrawn,
+                                          style: secondaryTextStyle(),
+                                        ),
+                                        Text(
+                                          totalWithdrawn.validate(),
+                                          style: primaryTextStyle(size: 14),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              12.height,
+                              Text(
+                                language.lastLocation,
+                                style: boldTextStyle(size: 16),
+                              ),
+                              12.height,
+                              Container(
+                                decoration: boxDecorationWithRoundedCorners(
+                                  borderRadius: BorderRadius.circular(
+                                    defaultRadius,
+                                  ),
+                                  border: Border.all(
+                                    color: ColorUtils.colorPrimary.withValues(
+                                      alpha: 0.3,
+                                    ),
+                                  ),
+                                  backgroundColor: Colors.transparent,
+                                ),
+                                padding: .all(12),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: .spaceBetween,
+                                      children: [
+                                        Text(
+                                          language.latitude,
+                                          style: secondaryTextStyle(),
+                                        ),
+                                        Text(
+                                          widget.userData!.latitude.toString(),
+                                          style: primaryTextStyle(size: 14),
+                                        ),
+                                      ],
+                                    ),
+                                    8.height,
+                                    Row(
+                                      mainAxisAlignment: .spaceBetween,
+                                      children: [
+                                        Text(
+                                          language.longitude,
+                                          style: secondaryTextStyle(),
+                                        ),
+                                        Text(
+                                          widget.userData!.longitude.toString(),
+                                          style: primaryTextStyle(size: 14),
+                                        ),
+                                      ],
+                                    ),
+                                    8.height,
+                                    Row(
+                                      mainAxisAlignment: .spaceBetween,
+                                      //   crossAxisAlignment: .end,
+                                      children: [
+                                        Text(
+                                          language.address,
+                                          style: secondaryTextStyle(),
+                                        ),
+                                        Container(
+                                          width: context.width() * 0.5,
+                                          child: Align(
+                                            alignment: Alignment.centerRight,
+                                            child: Text(
+                                              addressValue,
+                                              textAlign: TextAlign.start,
+                                              style: secondaryTextStyle(),
+                                              maxLines: 3,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                    ],
-                  )
-                ])
+                            ],
+                          ),
+                      ],
+                    ),
+                  ],
+                )
               : SizedBox(),
-        ]));
+        ],
+      ),
+    );
   }
 }

@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "449277276440-j2lfvo4d253rlqj4hm28j3qpajgbjjgs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tsdigital.veloxiapp",
+            "certificate_hash": "00ec012720a8f1d41cde7788658c8ddc6e3c8261"
+          }
+        },
+        {
           "client_id": "449277276440-nr1bacb7crd196k5k5d10k3e49v271n2.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

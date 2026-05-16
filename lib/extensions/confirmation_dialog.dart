@@ -16,10 +16,22 @@ import 'loader_widget.dart';
 enum DialogType { CONFIRMATION, ACCEPT, DELETE, UPDATE, ADD, RETRY }
 
 /// Enum for Dialog Animation
-enum DialogAnimation { DEFAULT, ROTATE, SLIDE_TOP_BOTTOM, SLIDE_BOTTOM_TOP, SLIDE_LEFT_RIGHT, SLIDE_RIGHT_LEFT, SCALE }
+enum DialogAnimation {
+  DEFAULT,
+  ROTATE,
+  SLIDE_TOP_BOTTOM,
+  SLIDE_BOTTOM_TOP,
+  SLIDE_LEFT_RIGHT,
+  SLIDE_RIGHT_LEFT,
+  SCALE,
+}
 
 /// dialog primary color
-Color getDialogPrimaryColor(BuildContext context, DialogType dialogType, Color? primaryColor) {
+Color getDialogPrimaryColor(
+  BuildContext context,
+  DialogType dialogType,
+  Color? primaryColor,
+) {
   if (primaryColor != null) return primaryColor;
   Color color;
 
@@ -107,7 +119,11 @@ Widget getIcon(DialogType dialogType, {double? size}) {
       icon = Icon(Icons.done, size: size ?? 20, color: Colors.white);
       break;
     case DialogType.DELETE:
-      icon = Icon(Icons.delete_forever_outlined, size: size ?? 20, color: Colors.white);
+      icon = Icon(
+        Icons.delete_forever_outlined,
+        size: size ?? 20,
+        color: Colors.white,
+      );
       break;
     case DialogType.UPDATE:
       icon = Icon(Icons.edit, size: size ?? 20, color: Colors.white);
@@ -131,7 +147,11 @@ Widget? getCenteredImage(
     case DialogType.CONFIRMATION:
       widget = Container(
         decoration: BoxDecoration(
-          color: getDialogPrimaryColor(context, dialogType, primaryColor).withValues(alpha:0.2),
+          color: getDialogPrimaryColor(
+            context,
+            dialogType,
+            primaryColor,
+          ).withValues(alpha: 0.2),
           shape: BoxShape.circle,
         ),
         child: Icon(
@@ -145,17 +165,29 @@ Widget? getCenteredImage(
     case DialogType.DELETE:
       widget = Container(
         decoration: BoxDecoration(
-          color: getDialogPrimaryColor(context, dialogType, primaryColor).withValues(alpha:0.2),
+          color: getDialogPrimaryColor(
+            context,
+            dialogType,
+            primaryColor,
+          ).withValues(alpha: 0.2),
           shape: BoxShape.circle,
         ),
-        child: Icon(Icons.close, color: getDialogPrimaryColor(context, dialogType, primaryColor), size: 40),
+        child: Icon(
+          Icons.close,
+          color: getDialogPrimaryColor(context, dialogType, primaryColor),
+          size: 40,
+        ),
         padding: .all(16),
       );
       break;
     case DialogType.UPDATE:
       widget = Container(
         decoration: BoxDecoration(
-          color: getDialogPrimaryColor(context, dialogType, primaryColor).withValues(alpha:0.2),
+          color: getDialogPrimaryColor(
+            context,
+            dialogType,
+            primaryColor,
+          ).withValues(alpha: 0.2),
           shape: BoxShape.circle,
         ),
         child: Icon(
@@ -170,7 +202,11 @@ Widget? getCenteredImage(
     case DialogType.ACCEPT:
       widget = Container(
         decoration: BoxDecoration(
-          color: getDialogPrimaryColor(context, dialogType, primaryColor).withValues(alpha:0.2),
+          color: getDialogPrimaryColor(
+            context,
+            dialogType,
+            primaryColor,
+          ).withValues(alpha: 0.2),
           shape: BoxShape.circle,
         ),
         child: Icon(
@@ -188,16 +224,14 @@ Widget? getCenteredImage(
             context,
             dialogType,
             primaryColor,
-          ).withValues(alpha:0.2),
+          ).withValues(alpha: 0.2),
           shape: BoxShape.circle,
         ),
-        child: Icon(Icons.refresh_rounded,
-            color: getDialogPrimaryColor(
-              context,
-              dialogType,
-              primaryColor,
-            ),
-            size: 40),
+        child: Icon(
+          Icons.refresh_rounded,
+          color: getDialogPrimaryColor(context, dialogType, primaryColor),
+          size: 40,
+        ),
         padding: .all(16),
       );
       break;
@@ -219,7 +253,12 @@ Widget defaultPlaceHolder(
     height: height,
     width: width,
     decoration: BoxDecoration(
-      color: getDialogPrimaryColor(context, dialogType, primaryColor).withValues(alpha:0.2),
+      gradient: ColorUtils.tealGradient,
+      // color: getDialogPrimaryColor(
+      //   context,
+      //   dialogType,
+      //   primaryColor,
+      // ).withValues(alpha: 0.2),
     ),
     alignment: Alignment.center,
     child: child ?? getCenteredImage(context, dialogType, primaryColor),
@@ -240,6 +279,7 @@ Widget buildTitleWidget(
   if (customCenterWidget != null) {
     return Container(
       child: customCenterWidget,
+      decoration: BoxDecoration(gradient: ColorUtils.tealGradient),
       constraints: BoxConstraints(maxHeight: height, maxWidth: width),
     );
   } else {
@@ -273,7 +313,8 @@ Widget buildTitleWidget(
             shape: shape,
             child: Loader(
               value: loadingProgress.expectedTotalBytes != null
-                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                  ? loadingProgress.cumulativeBytesLoaded /
+                        loadingProgress.expectedTotalBytes!
                   : null,
             ),
           );
@@ -340,16 +381,20 @@ Future<bool?> showConfirmDialogCustom(
           titlePadding: .zero,
           backgroundColor: Theme.of(context).cardColor,
           elevation: defaultElevation.toDouble(),
-          title: buildTitleWidget(
-            context,
-            dialogType,
-            primaryColor,
-            customCenterWidget,
-            height ?? customDialogHeight,
-            width ?? customDialogWidth,
-            centerImage,
-            shape,
-          ).cornerRadiusWithClipRRectOnly(topLeft: defaultRadius.toInt(), topRight: defaultRadius.toInt()),
+          title:
+              buildTitleWidget(
+                context,
+                dialogType,
+                primaryColor,
+                customCenterWidget,
+                height ?? customDialogHeight,
+                width ?? customDialogWidth,
+                centerImage,
+                shape,
+              ).cornerRadiusWithClipRRectOnly(
+                topLeft: defaultRadius.toInt(),
+                topRight: defaultRadius.toInt(),
+              ),
           content: Container(
             width: width ?? customDialogWidth,
             color: Colors.transparent,
@@ -371,10 +416,7 @@ Future<bool?> showConfirmDialogCustom(
                 8.height.visible(note.validate().isNotEmpty),
                 Text(
                   note.validate(),
-                  style: secondaryTextStyle(
-                    size: 13,
-                    color: Colors.red,
-                  ),
+                  style: secondaryTextStyle(size: 13, color: Colors.red),
                   textAlign: TextAlign.center,
                 ).visible(note.validate().isNotEmpty),
                 16.height,
@@ -398,7 +440,10 @@ Future<bool?> showConfirmDialogCustom(
                           6.width,
                           Text(
                             negativeText ?? 'Cancel',
-                            style: boldTextStyle(color: negativeTextColor ?? textPrimaryColorGlobal),
+                            style: boldTextStyle(
+                              color:
+                                  negativeTextColor ?? textPrimaryColorGlobal,
+                            ),
                           ),
                         ],
                       ).fit(),
@@ -409,43 +454,52 @@ Future<bool?> showConfirmDialogCustom(
                       },
                     ).expand().visible(showCancelButton),
                     16.width.visible(showCancelButton),
-                    Builder(builder: (_) {
-                      final bool useBrandGradient =
-                          dialogType == DialogType.CONFIRMATION && primaryColor == null;
-                      final Widget positiveBtn = AppButton(
-                        elevation: 0,
-                        color: useBrandGradient
-                            ? Colors.transparent
-                            : getDialogPrimaryColor(context, dialogType, primaryColor),
-                        shapeBorder: RoundedRectangleBorder(
-                          borderRadius: radius(defaultAppButtonRadius),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            getIcon(dialogType),
-                            6.width,
-                            Text(
-                              positiveText ?? getPositiveText(dialogType),
-                              style: boldTextStyle(color: positiveTextColor ?? Colors.white),
-                            ),
-                          ],
-                        ).fit(),
-                        onTap: () {
-                          onAccept.call(context);
+                    Builder(
+                      builder: (_) {
+                        final bool useBrandGradient =
+                            dialogType == DialogType.CONFIRMATION &&
+                            primaryColor == null;
+                        final Widget positiveBtn = AppButton(
+                          elevation: 0,
+                          // color: useBrandGradient
+                          //     ? Colors.transparent
+                          //     : getDialogPrimaryColor(
+                          //         context,
+                          //         dialogType,
+                          //         primaryColor,
+                          //       ),
+                          shapeBorder: RoundedRectangleBorder(
+                            borderRadius: radius(defaultAppButtonRadius),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              getIcon(dialogType),
+                              6.width,
+                              Text(
+                                positiveText ?? getPositiveText(dialogType),
+                                style: boldTextStyle(
+                                  color: positiveTextColor ?? Colors.white,
+                                ),
+                              ),
+                            ],
+                          ).fit(),
+                          onTap: () {
+                            onAccept.call(context);
 
-                          if (cancelable) finish(context, true);
-                        },
-                      );
-                      if (!useBrandGradient) return positiveBtn.expand();
-                      return DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: ColorUtils.tealGradient,
-                          borderRadius: radius(defaultAppButtonRadius),
-                        ),
-                        child: positiveBtn,
-                      ).expand();
-                    }),
+                            if (cancelable) finish(context, true);
+                          },
+                        );
+                        if (!useBrandGradient) return positiveBtn.expand();
+                        return DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: ColorUtils.tealGradient,
+                            borderRadius: radius(defaultAppButtonRadius),
+                          ),
+                          child: positiveBtn,
+                        ).expand();
+                      },
+                    ),
                   ],
                 ),
               ],

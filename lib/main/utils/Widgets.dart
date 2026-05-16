@@ -10,15 +10,20 @@ import '../../extensions/text_styles.dart';
 import '../../main.dart';
 import 'Constants.dart';
 
-Widget commonButton(String title, Function() onTap, {double? width, Color? color, Color? textColor, int? size}) {
+Widget commonButton(
+  String title,
+  Function() onTap, {
+  double? width,
+  Color? color,
+  Color? textColor,
+  int? size,
+}) {
   return SizedBox(
     width: width,
     child: Container(
       height: 48,
       decoration: BoxDecoration(
-        gradient: color != null
-            ? null
-            : ColorUtils.tealGradient,
+        gradient: color != null ? null : ColorUtils.tealGradient,
         color: color,
         borderRadius: BorderRadius.circular(defaultRadius),
       ),
@@ -30,7 +35,10 @@ Widget commonButton(String title, Function() onTap, {double? width, Color? color
           child: Center(
             child: Text(
               title,
-              style: boldTextStyle(color: textColor ?? Colors.white, size: size ?? textBoldSizeGlobal.toInt()),
+              style: boldTextStyle(
+                color: textColor ?? Colors.white,
+                size: size ?? textBoldSizeGlobal.toInt(),
+              ),
             ),
           ),
         ),
@@ -39,16 +47,25 @@ Widget commonButton(String title, Function() onTap, {double? width, Color? color
   );
 }
 
-Widget outlineButton(String title, Function() onTap, {double? width, Color? color}) {
+Widget outlineButton(
+  String title,
+  Function() onTap, {
+  double? width,
+  Color? color,
+}) {
   return SizedBox(
     width: width,
     child: TextButton(
-      child: Text(title, style: boldTextStyle(color: color ?? ColorUtils.colorPrimary)),
+      child: Text(
+        title,
+        style: boldTextStyle(color: color ?? ColorUtils.colorPrimary),
+      ),
       onPressed: onTap,
       style: TextButton.styleFrom(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(defaultRadius),
-            side: BorderSide(color: color ?? ColorUtils.colorPrimary)),
+          borderRadius: BorderRadius.circular(defaultRadius),
+          side: BorderSide(color: color ?? ColorUtils.colorPrimary),
+        ),
         elevation: 0,
         padding: .symmetric(vertical: 14, horizontal: 16),
         backgroundColor: Colors.transparent,
@@ -57,7 +74,12 @@ Widget outlineButton(String title, Function() onTap, {double? width, Color? colo
   );
 }
 
-Widget scheduleOptionWidget(BuildContext context, bool isSelected, String imagePath, String title) {
+Widget scheduleOptionWidget(
+  BuildContext context,
+  bool isSelected,
+  String imagePath,
+  String title,
+) {
   return Container(
     padding: .all(16),
     alignment: Alignment.center,
@@ -67,22 +89,40 @@ Widget scheduleOptionWidget(BuildContext context, bool isSelected, String imageP
             borderRadius: BorderRadius.circular(defaultRadius),
           )
         : boxDecorationWithRoundedCorners(
-            border: Border.all(color: appStore.isDarkMode ? ColorUtils.dividerColor : ColorUtils.borderColor),
-            backgroundColor: context.cardColor),
+            border: Border.all(
+              color: appStore.isDarkMode
+                  ? ColorUtils.dividerColor
+                  : ColorUtils.borderColor,
+            ),
+            backgroundColor: context.cardColor,
+          ),
     child: Row(
       crossAxisAlignment: .center,
       mainAxisAlignment: .center,
       children: [
-        Icon(title == language.schedule ? Feather.calendar : Feather.clock,
-            size: 18, color: isSelected ? Colors.white : context.iconColor),
+        Icon(
+          title == language.schedule ? Feather.calendar : Feather.clock,
+          size: 18,
+          color: isSelected ? Colors.white : context.iconColor,
+        ),
         8.width,
-        Text(title, style: boldTextStyle(color: isSelected ? Colors.white : textPrimaryColorGlobal)),
+        Text(
+          title,
+          style: boldTextStyle(
+            color: isSelected ? Colors.white : textPrimaryColorGlobal,
+          ),
+        ),
       ],
     ),
   );
 }
 
-Widget enableBidOptionWidget(BuildContext context, bool isSelected, IconData icon, String title) {
+Widget enableBidOptionWidget(
+  BuildContext context,
+  bool isSelected,
+  IconData icon,
+  String title,
+) {
   return Container(
     padding: .all(16),
     alignment: Alignment.center,
@@ -92,15 +132,25 @@ Widget enableBidOptionWidget(BuildContext context, bool isSelected, IconData ico
             borderRadius: BorderRadius.circular(defaultRadius),
           )
         : boxDecorationWithRoundedCorners(
-            border: Border.all(color: appStore.isDarkMode ? ColorUtils.dividerColor : ColorUtils.borderColor),
-            backgroundColor: context.cardColor),
+            border: Border.all(
+              color: appStore.isDarkMode
+                  ? ColorUtils.dividerColor
+                  : ColorUtils.borderColor,
+            ),
+            backgroundColor: context.cardColor,
+          ),
     child: Row(
       crossAxisAlignment: .center,
       mainAxisAlignment: .center,
       children: [
         Icon(icon, color: isSelected ? Colors.white : context.iconColor),
         8.width,
-        Text(title, style: boldTextStyle(color: isSelected ? Colors.white : textPrimaryColorGlobal)),
+        Text(
+          title,
+          style: boldTextStyle(
+            color: isSelected ? Colors.white : textPrimaryColorGlobal,
+          ),
+        ),
       ],
     ),
   );
@@ -130,29 +180,37 @@ AppBar commonAppBarWidget(
 }) {
   final bool useTealGradient = color == null && flexibleSpace == null;
 
-  final Widget? resolvedFlexibleSpace = flexibleSpace ??
+  final Widget? resolvedFlexibleSpace =
+      flexibleSpace ??
       (useTealGradient
           ? Container(
-              decoration: BoxDecoration(
-                gradient: ColorUtils.tealGradient,
-              ),
+              decoration: BoxDecoration(gradient: ColorUtils.tealGradient),
             )
           : null);
 
   return AppBar(
     centerTitle: center,
-    title: titleWidget ??
-        Text(title,
-            style: titleTextStyle ?? boldTextStyle(color: textColor ?? Colors.white, size: textSize)),
+    title:
+        titleWidget ??
+        Text(
+          title,
+          style:
+              titleTextStyle ??
+              boldTextStyle(color: textColor ?? Colors.white, size: textSize),
+        ),
     actions: actions ?? [],
     automaticallyImplyLeading: showBack,
     backgroundColor: resolvedFlexibleSpace != null
         ? Colors.transparent
         : (color ?? ColorUtils.colorPrimary),
-    leading: showBack ? (backWidget ?? BackButton(color: textColor ?? Colors.white)) : null,
+    leading: showBack
+        ? (backWidget ?? BackButton(color: textColor ?? Colors.white))
+        : null,
     shadowColor: shadowColor,
     shape: isBottom
-        ? RoundedRectangleBorder(borderRadius: radiusOnly(bottomRight: 20, bottomLeft: 20))
+        ? RoundedRectangleBorder(
+            borderRadius: radiusOnly(bottomRight: 20, bottomLeft: 20),
+          )
         : null,
     elevation: elevation ?? defaultAppBarElevation,
     systemOverlayStyle: systemUiOverlayStyle,

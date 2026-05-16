@@ -50,7 +50,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
   TextEditingController addressController = TextEditingController();
 
   FocusNode emailFocus = FocusNode();
-//  FocusNode usernameFocus = FocusNode();
+  //  FocusNode usernameFocus = FocusNode();
   FocusNode nameFocus = FocusNode();
   FocusNode contactFocus = FocusNode();
   FocusNode addressFocus = FocusNode();
@@ -79,14 +79,21 @@ class EditProfileScreenState extends State<EditProfileScreen> {
 
   Widget profileImage() {
     if (imageProfile != null) {
-      return Image.file(File(imageProfile!.path), height: 100, width: 100, fit: BoxFit.cover, alignment: Alignment.center)
-          .cornerRadiusWithClipRRect(100)
-          .center();
+      return Image.file(
+        File(imageProfile!.path),
+        height: 100,
+        width: 100,
+        fit: BoxFit.cover,
+        alignment: Alignment.center,
+      ).cornerRadiusWithClipRRect(100).center();
     } else {
       if (appStore.userProfile.isNotEmpty) {
-        return commonCachedNetworkImage(appStore.userProfile.validate(), fit: BoxFit.cover, height: 100, width: 100)
-            .cornerRadiusWithClipRRect(100)
-            .center();
+        return commonCachedNetworkImage(
+          appStore.userProfile.validate(),
+          fit: BoxFit.cover,
+          height: 100,
+          width: 100,
+        ).cornerRadiusWithClipRRect(100).center();
       } else {
         return commonCachedNetworkImage(ic_profile, height: 90, width: 90)
             .cornerRadiusWithClipRRect(50)
@@ -98,29 +105,45 @@ class EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> getImage() async {
     imageProfile = null;
-    imageProfile = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 100);
+    imageProfile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 100,
+    );
     setState(() {});
   }
 
   Future<void> save() async {
     appStore.setLoading(true);
     await updateProfile(
-      file: imageProfile != null ? File(imageProfile!.path.validate()) : null,
-      name: nameController.text.validate(),
-      userName: emailController.text.validate(),
-      userEmail: emailController.text.validate(),
-      address: addressController.text.validate(),
-      contactNumber: '$countryCode ${contactNumberController.text.trim()}',
-    ).then((value) {
-      // finish(context);
-    }).catchError((error) {
-      log(error);
-      appStore.setLoading(false);
-    });
+          file: imageProfile != null
+              ? File(imageProfile!.path.validate())
+              : null,
+          name: nameController.text.validate(),
+          userName: emailController.text.validate(),
+          userEmail: emailController.text.validate(),
+          address: addressController.text.validate(),
+          contactNumber: '$countryCode ${contactNumberController.text.trim()}',
+        )
+        .then((value) {
+          // finish(context);
+        })
+        .catchError((error) {
+          log(error);
+          appStore.setLoading(false);
+        });
   }
 
-  Future updateProfile({String? userName, String? name, String? userEmail, String? address, String? contactNumber, File? file}) async {
-    MultipartRequest multiPartRequest = await getMultiPartRequest('update-profile');
+  Future updateProfile({
+    String? userName,
+    String? name,
+    String? userEmail,
+    String? address,
+    String? contactNumber,
+    File? file,
+  }) async {
+    MultipartRequest multiPartRequest = await getMultiPartRequest(
+      'update-profile',
+    );
     multiPartRequest.fields['id'] = getIntAsync(USER_ID).toString();
     multiPartRequest.fields['username'] = userName.validate();
     multiPartRequest.fields['email'] = userEmail ?? appStore.userEmail;
@@ -128,31 +151,41 @@ class EditProfileScreenState extends State<EditProfileScreen> {
     multiPartRequest.fields['contact_number'] = contactNumber.validate();
     multiPartRequest.fields['address'] = address.validate();
 
-    if (file != null) multiPartRequest.files.add(await MultipartFile.fromPath('profile_image', file.path));
+    if (file != null)
+      multiPartRequest.files.add(
+        await MultipartFile.fromPath('profile_image', file.path),
+      );
 
-    await sendMultiPartRequest(multiPartRequest, onSuccess: (data) async {
-      if (data != null) {
-        LoginResponse res = LoginResponse.fromJson(data);
-        if (res.data != null) {
-          appStore.setLoading(false);
-          if (widget.isGoogle == true) {
-            UserCitySelectScreen().launch(context, isNewTask: true);
-          } else {
-            Navigator.pop(context);
+    await sendMultiPartRequest(
+      multiPartRequest,
+      onSuccess: (data) async {
+        if (data != null) {
+          LoginResponse res = LoginResponse.fromJson(data);
+          if (res.data != null) {
+            appStore.setLoading(false);
+            if (widget.isGoogle == true) {
+              UserCitySelectScreen().launch(context, isNewTask: true);
+            } else {
+              Navigator.pop(context);
+            }
+            await setValue(NAME, res.data!.name.validate());
+            await setValue(USER_NAME, res.data!.username.validate());
+            await setValue(USER_ADDRESS, res.data!.address.validate());
+            await setValue(
+              USER_CONTACT_NUMBER,
+              res.data!.contactNumber.validate(),
+            );
+            await appStore.setUserEmail(res.data!.email.validate());
+            appStore.setUserProfile(res.data!.profileImage.validate());
           }
-          await setValue(NAME, res.data!.name.validate());
-          await setValue(USER_NAME, res.data!.username.validate());
-          await setValue(USER_ADDRESS, res.data!.address.validate());
-          await setValue(USER_CONTACT_NUMBER, res.data!.contactNumber.validate());
-          await appStore.setUserEmail(res.data!.email.validate());
-          appStore.setUserProfile(res.data!.profileImage.validate());
+          toast(res.message.toString());
         }
-        toast(res.message.toString());
-      }
-    }, onError: (error) {
-      appStore.setLoading(false);
-      toast(error.toString());
-    });
+      },
+      onError: (error) {
+        appStore.setLoading(false);
+        toast(error.toString());
+      },
+    );
   }
 
   @override
@@ -183,20 +216,21 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                           margin: .only(top: 60, left: 80),
                           padding: .all(6),
                           decoration: boxDecorationWithRoundedCorners(
-                              backgroundColor: ColorUtils.colorPrimary,
-                              border: Border.all(width: 1, color: Colors.white),
-                              boxShape: BoxShape.circle),
-                          child: Icon(
-                            Icons.edit,
-                            color: white,
-                            size: 16,
+                            backgroundColor: ColorUtils.colorPrimary,
+                            border: Border.all(width: 1, color: Colors.white),
+                            boxShape: BoxShape.circle,
                           ),
+                          child: Icon(Icons.edit, color: white, size: 16),
                         ),
-                      )
+                      ),
                     ],
-                  ).onTap(() {
-                    getImage();
-                  }, highlightColor: Colors.transparent, splashColor: Colors.transparent),
+                  ).onTap(
+                    () {
+                      getImage();
+                    },
+                    highlightColor: Colors.transparent,
+                    splashColor: Colors.transparent,
+                  ),
                   16.height,
                   Text(language.email, style: primaryTextStyle()),
                   8.height,
@@ -239,20 +273,33 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                             CountryCodePicker(
                               initialSelection: countryCode,
                               showCountryOnly: false,
-                              dialogSize: Size(context.width() - 60, context.height() * 0.6),
+                              dialogSize: Size(
+                                context.width() - 60,
+                                context.height() * 0.6,
+                              ),
                               showFlag: true,
                               enabled: widget.isGoogle.validate(),
                               showFlagDialog: true,
                               showOnlyCountryWhenClosed: false,
                               alignLeft: false,
                               textStyle: primaryTextStyle(),
-                              dialogBackgroundColor: Theme.of(context).cardColor,
+                              dialogBackgroundColor: Theme.of(
+                                context,
+                              ).cardColor,
                               barrierColor: Colors.black12,
                               dialogTextStyle: primaryTextStyle(),
                               searchDecoration: InputDecoration(
                                 iconColor: Theme.of(context).dividerColor,
-                                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Theme.of(context).dividerColor)),
-                                focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: ColorUtils.colorPrimary)),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Theme.of(context).dividerColor,
+                                  ),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: ColorUtils.colorPrimary,
+                                  ),
+                                ),
                               ),
                               searchStyle: primaryTextStyle(),
                               onInit: (c) {
@@ -262,24 +309,27 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                                 countryCode = c.dialCode!;
                               },
                             ),
-                            VerticalDivider(color: Colors.grey.withValues(alpha:0.5)),
+                            VerticalDivider(
+                              color: Colors.grey.withValues(alpha: 0.5),
+                            ),
                           ],
                         ),
                       ),
                     ),
                     validator: (value) {
-                      if (value!.trim().isEmpty) return language.fieldRequiredMsg;
+                      if (value!.trim().isEmpty)
+                        return language.fieldRequiredMsg;
                       //  if (value.trim().length < minContactLength || value.trim().length > maxContactLength) return language.contactLength;
-                      if (value.trim().length < minContactLength || value.trim().length > maxContactLength)
+                      if (value.trim().length < minContactLength ||
+                          value.trim().length > maxContactLength)
                         return language.phoneNumberInvalid;
                       return null;
                     },
                     onTap: () {
-                      if (!widget.isGoogle.validate()) toast(language.notChangeMobileNo);
+                      if (!widget.isGoogle.validate())
+                        toast(language.notChangeMobileNo);
                     },
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                    ],
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   ),
                   16.height,
                   if (!widget.isGoogle.validate()) ...[
@@ -306,7 +356,8 @@ class EditProfileScreenState extends State<EditProfileScreen> {
         padding: .all(16),
         child: commonButton(language.saveChanges, () {
           if (_formKey.currentState!.validate()) {
-            if (getStringAsync(USER_EMAIL) == 'jose@gmail.com' || getStringAsync(USER_EMAIL) == 'mark@gmail.com') {
+            if (getStringAsync(USER_EMAIL) == 'jose@gmail.com' ||
+                getStringAsync(USER_EMAIL) == 'mark@gmail.com') {
               toast(language.demoMsg);
             } else {
               save();

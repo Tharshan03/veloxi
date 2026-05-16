@@ -70,8 +70,9 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
 
   TextEditingController parcelTypeCont = TextEditingController();
   TextEditingController weightController = TextEditingController(text: '1');
-  TextEditingController totalParcelController =
-      TextEditingController(text: '1');
+  TextEditingController totalParcelController = TextEditingController(
+    text: '1',
+  );
 
   TextEditingController pickAddressCont = TextEditingController();
   TextEditingController pickPersonNameCont = TextEditingController();
@@ -153,7 +154,7 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
     language.pickupInformation,
     language.deliveryInformation,
     language.reviewRoute,
-    language.details
+    language.details,
   ];
   CouponListResponseModel? couponListResponseModel;
   CouponModel? selectedCoupon;
@@ -170,52 +171,64 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
   }
 
   getStaticDetailsForOrder() async {
-    await getCreateOrderDetails(getIntAsync(CITY_ID)).then((value) async {
-      appStore.setLoading(false);
-      await setValue(CITY_DATA, value.cityDetail!.toJson());
-      cityData = value.cityDetail;
-      value.useraddressDetail!.forEach((element) {
-        addressList.add(element);
-      });
-      if (addressList.isNotEmpty) {
-        pickAddressData = addressList.first;
-        deliveryAddressData = addressList.first;
-      }
-      List<UseraddressDetail> list = [];
-      addressList.forEach((e) {
-        list.add(e);
-      });
-      setValue(RECENT_ADDRESS_LIST,
-          list.map((element) => jsonEncode(element)).toList());
-      vehicleList.clear();
-      vehicleList = value.vehicleDetail!;
-      if (value.vehicleDetail!.isNotEmpty)
-        selectedVehicle = value.vehicleDetail![0].id;
-      parcelTypeList.clear();
-      parcelTypeList.addAll(value.staticDetails!);
-      appStore.setCurrencyCode(
-          value.appSettingDetail!.currencyCode ?? CURRENCY_CODE);
-      appStore.setCurrencySymbol(
-          value.appSettingDetail!.currency ?? CURRENCY_SYMBOL);
-      appStore.setCurrencyPosition(
-          value.appSettingDetail!.currencyPosition ?? CURRENCY_POSITION_LEFT);
-      appStore.setIsInsuranceAllowed(
-          value.appSettingDetail!.isInsuranceAllow.toString());
-      appStore.setInsurancePercentage(
-          value.appSettingDetail!.insurancePercentage.toString());
-      appStore.setInsuranceDescription(
-          value.appSettingDetail!.insuranceDescription.toString());
-      appStore.setIsBiddingStatus(
-          value.appSettingDetail!.isBiddingEnabled.toString());
-      appStore.isVehicleOrder = value.appSettingDetail!.isVehicleInOrder ?? 0;
-      appStore.setIsSmsOrder(value.appSettingDetail!.isSmsOrder ?? 0);
-      print("------------isSmsOrder${appStore.isSmsOrder}");
-      setState(() {});
-    }).catchError((error, trace) {
-      appStore.setLoading(false);
-      debugPrint("User facing Error ${error} Trace ${trace}");
-      toast(error.toString());
-    });
+    await getCreateOrderDetails(getIntAsync(CITY_ID))
+        .then((value) async {
+          appStore.setLoading(false);
+          await setValue(CITY_DATA, value.cityDetail!.toJson());
+          cityData = value.cityDetail;
+          value.useraddressDetail!.forEach((element) {
+            addressList.add(element);
+          });
+          if (addressList.isNotEmpty) {
+            pickAddressData = addressList.first;
+            deliveryAddressData = addressList.first;
+          }
+          List<UseraddressDetail> list = [];
+          addressList.forEach((e) {
+            list.add(e);
+          });
+          setValue(
+            RECENT_ADDRESS_LIST,
+            list.map((element) => jsonEncode(element)).toList(),
+          );
+          vehicleList.clear();
+          vehicleList = value.vehicleDetail!;
+          if (value.vehicleDetail!.isNotEmpty)
+            selectedVehicle = value.vehicleDetail![0].id;
+          parcelTypeList.clear();
+          parcelTypeList.addAll(value.staticDetails!);
+          appStore.setCurrencyCode(
+            value.appSettingDetail!.currencyCode ?? CURRENCY_CODE,
+          );
+          appStore.setCurrencySymbol(
+            value.appSettingDetail!.currency ?? CURRENCY_SYMBOL,
+          );
+          appStore.setCurrencyPosition(
+            value.appSettingDetail!.currencyPosition ?? CURRENCY_POSITION_LEFT,
+          );
+          appStore.setIsInsuranceAllowed(
+            value.appSettingDetail!.isInsuranceAllow.toString(),
+          );
+          appStore.setInsurancePercentage(
+            value.appSettingDetail!.insurancePercentage.toString(),
+          );
+          appStore.setInsuranceDescription(
+            value.appSettingDetail!.insuranceDescription.toString(),
+          );
+          appStore.setIsBiddingStatus(
+            value.appSettingDetail!.isBiddingEnabled.toString(),
+          );
+          appStore.isVehicleOrder =
+              value.appSettingDetail!.isVehicleInOrder ?? 0;
+          appStore.setIsSmsOrder(value.appSettingDetail!.isSmsOrder ?? 0);
+          print("------------isSmsOrder${appStore.isSmsOrder}");
+          setState(() {});
+        })
+        .catchError((error, trace) {
+          appStore.setLoading(false);
+          debugPrint("User facing Error ${error} Trace ${trace}");
+          toast(error.toString());
+        });
   }
 
   getCouponList() async {
@@ -237,14 +250,12 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
 
   Future<void> init() async {
     try {
-      pickupCountryCode = CountryModel.fromJson(getJSONAsync(COUNTRY_DATA))
-              .code
-              .isEmptyOrNull
+      pickupCountryCode =
+          CountryModel.fromJson(getJSONAsync(COUNTRY_DATA)).code.isEmptyOrNull
           ? defaultPhoneCode
           : CountryModel.fromJson(getJSONAsync(COUNTRY_DATA)).code.validate();
-      deliverCountryCode = CountryModel.fromJson(getJSONAsync(COUNTRY_DATA))
-              .code
-              .isEmptyOrNull
+      deliverCountryCode =
+          CountryModel.fromJson(getJSONAsync(COUNTRY_DATA)).code.isEmptyOrNull
           ? defaultPhoneCode
           : CountryModel.fromJson(getJSONAsync(COUNTRY_DATA)).code.validate();
       await getStaticDetailsForOrder();
@@ -254,20 +265,23 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
         if (widget.orderData!.totalWeight != 0)
           weightController.text = widget.orderData!.totalWeight!.toString();
         if (widget.orderData!.totalParcel != null)
-          totalParcelController.text =
-              widget.orderData!.totalParcel!.toString();
+          totalParcelController.text = widget.orderData!.totalParcel!
+              .toString();
         parcelTypeCont.text = widget.orderData!.parcelType.validate();
 
-        pickAddressCont.text =
-            widget.orderData!.pickupPoint!.address.validate();
-        pickPersonNameCont.text =
-            widget.orderData!.pickupPoint!.name.validate();
-        deliverPersonNameCont.text =
-            widget.orderData!.deliveryPoint!.name.validate();
-        deliverInstructionCont.text =
-            widget.orderData!.deliveryPoint!.instruction.validate();
-        pickInstructionCont.text =
-            widget.orderData!.pickupPoint!.instruction.validate();
+        pickAddressCont.text = widget.orderData!.pickupPoint!.address
+            .validate();
+        pickPersonNameCont.text = widget.orderData!.pickupPoint!.name
+            .validate();
+        deliverPersonNameCont.text = widget.orderData!.deliveryPoint!.name
+            .validate();
+        deliverInstructionCont.text = widget
+            .orderData!
+            .deliveryPoint!
+            .instruction
+            .validate();
+        pickInstructionCont.text = widget.orderData!.pickupPoint!.instruction
+            .validate();
         pickLat = widget.orderData!.pickupPoint!.latitude.validate();
         pickLong = widget.orderData!.pickupPoint!.longitude.validate();
         if (widget.orderData!.pickupPoint!.contactNumber
@@ -289,11 +303,11 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
               .split(" ")
               .last;
         }
-        pickDesCont.text =
-            widget.orderData!.pickupPoint!.description.validate();
+        pickDesCont.text = widget.orderData!.pickupPoint!.description
+            .validate();
 
-        deliverAddressCont.text =
-            widget.orderData!.deliveryPoint!.address.validate();
+        deliverAddressCont.text = widget.orderData!.deliveryPoint!.address
+            .validate();
         deliverLat = widget.orderData!.deliveryPoint!.latitude.validate();
         deliverLong = widget.orderData!.deliveryPoint!.longitude.validate();
         if (widget.orderData!.deliveryPoint!.contactNumber
@@ -315,11 +329,12 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
               .split(" ")
               .last;
         }
-        deliverDesCont.text =
-            widget.orderData!.deliveryPoint!.description.validate();
+        deliverDesCont.text = widget.orderData!.deliveryPoint!.description
+            .validate();
 
-        paymentCollectFrom = widget.orderData!.paymentCollectFrom
-            .validate(value: PAYMENT_ON_PICKUP);
+        paymentCollectFrom = widget.orderData!.paymentCollectFrom.validate(
+          value: PAYMENT_ON_PICKUP,
+        );
       }
     } catch (e, s) {
       debugPrint("CreateOrderScreen Error ${e}, Trace ${s}");
@@ -364,7 +379,7 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
       "total_distance": totalDistance,
       "insurance_amount": insuranceAmountController.text.isEmpty
           ? 0
-          : insuranceAmountController.text
+          : insuranceAmountController.text,
     };
     await getTotalAmountForOrder(request).then((value) {
       print("getTotalForOrder response");
@@ -385,14 +400,18 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
 
     if (selectedCoupon?.valueType == "fixed") {
       double couponAmount = selectedCoupon?.discountAmount?.toDouble() ?? 0;
-      double finalTotal =
-          (totalAmount - couponAmount).clamp(0.00, double.infinity);
+      double finalTotal = (totalAmount - couponAmount).clamp(
+        0.00,
+        double.infinity,
+      );
       result = isAppliedCoupon ? finalTotal : totalAmount;
     } else if (selectedCoupon?.valueType == "percentage") {
       double percentage = selectedCoupon?.discountAmount?.toDouble() ?? 0;
       double discountAmount = (totalAmount * percentage) / 100;
-      double finalAmount =
-          (totalAmount - discountAmount).clamp(0.00, double.infinity);
+      double finalAmount = (totalAmount - discountAmount).clamp(
+        0.00,
+        double.infinity,
+      );
 
       result = isAppliedCoupon ? finalAmount : totalAmount;
     } else if (selectedCoupon == null && isAppliedCoupon == false) {
@@ -410,13 +429,15 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
     extraChargeList.clear();
     if (totalAmountResponse!.extraCharges != null) {
       totalAmountResponse!.extraCharges!.forEach((element) {
-        extraChargeList.add(ExtraChargeRequestModel(
+        extraChargeList.add(
+          ExtraChargeRequestModel(
             key: element.title!.toLowerCase().replaceAll(' ', "_"),
             value: element.charges,
-            valueType: element.chargesType));
+            valueType: element.chargesType,
+          ),
+        );
       });
     }
-
 
     appStore.setLoading(true);
     Map req = {
@@ -466,8 +487,9 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
       "extra_charges": extraChargeList,
       "parcel_type": parcelTypeCont.text,
       "total_weight": weightController.text.toDouble(),
-      "total_distance":
-          totalDistance.toStringAsFixed(digitAfterDecimal).validate(),
+      "total_distance": totalDistance
+          .toStringAsFixed(digitAfterDecimal)
+          .validate(),
       "payment_collect_from": paymentCollectFrom,
       "status": orderStatus,
       "payment_type": isSelected == 2 ? PAYMENT_TYPE_ONLINE : "",
@@ -492,45 +514,48 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
     pattern
         .allMatches(req.toString())
         .forEach((match) => print(match.group(0)));
-    await createOrder(req).then((value) async {
-      appStore.setLoading(false);
-      toast(value.message);
-      finish(context);
-      if (isSelected == 2) {
-        PaymentScreen(
-          orderId: value.orderId.validate(),
-          totalAmount: (totalAmountResponse!.totalAmount!),
-          isOnline: true,
-        ).launch(context);
-      } else if (isSelected == 3) {
-        log("-----available balance ${appStore.availableBal.toString()}-----------${totalAmountResponse!.totalAmount}----------${insuranceAmount}----------${(totalAmountResponse!.totalAmount! + insuranceAmount)}");
-        if (appStore.availableBal > (totalAmountResponse!.totalAmount!)) {
-          savePaymentApiCall(
-              paymentType: PAYMENT_TYPE_WALLET,
-              paymentStatus: PAYMENT_PAID,
-              totalAmount: (calculateTotalAmount()).toString(),
-              orderID: value.orderId.toString());
-        }
-      } else {
-        DashboardScreen().launch(
-          context,
-          isNewTask: true,
-        );
-      }
-    }).catchError((error) {
-      appStore.setLoading(false);
-      toast(error.toString());
-    });
+    await createOrder(req)
+        .then((value) async {
+          appStore.setLoading(false);
+          toast(value.message);
+          finish(context);
+          if (isSelected == 2) {
+            PaymentScreen(
+              orderId: value.orderId.validate(),
+              totalAmount: (totalAmountResponse!.totalAmount!),
+              isOnline: true,
+            ).launch(context);
+          } else if (isSelected == 3) {
+            log(
+              "-----available balance ${appStore.availableBal.toString()}-----------${totalAmountResponse!.totalAmount}----------${insuranceAmount}----------${(totalAmountResponse!.totalAmount! + insuranceAmount)}",
+            );
+            if (appStore.availableBal > (totalAmountResponse!.totalAmount!)) {
+              savePaymentApiCall(
+                paymentType: PAYMENT_TYPE_WALLET,
+                paymentStatus: PAYMENT_PAID,
+                totalAmount: (calculateTotalAmount()).toString(),
+                orderID: value.orderId.toString(),
+              );
+            }
+          } else {
+            DashboardScreen().launch(context, isNewTask: true);
+          }
+        })
+        .catchError((error) {
+          appStore.setLoading(false);
+          toast(error.toString());
+        });
   }
 
   /// Save Payment
-  Future<void> savePaymentApiCall(
-      {String? paymentType,
-      String? totalAmount,
-      String? orderID,
-      String? txnId,
-      String? paymentStatus = PAYMENT_PENDING,
-      Map? transactionDetail}) async {
+  Future<void> savePaymentApiCall({
+    String? paymentType,
+    String? totalAmount,
+    String? orderID,
+    String? txnId,
+    String? paymentStatus = PAYMENT_PENDING,
+    Map? transactionDetail,
+  }) async {
     Map req = {
       "id": "",
       "order_id": orderID,
@@ -540,26 +565,27 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
       "payment_type": paymentType,
       "txn_id": txnId,
       "payment_status": paymentStatus,
-      "transaction_detail": transactionDetail ?? {}
+      "transaction_detail": transactionDetail ?? {},
     };
 
     appStore.setLoading(true);
 
-    savePayment(req).then((value) {
-      appStore.setLoading(false);
-      toast(value.message.toString());
-      DashboardScreen().launch(context, isNewTask: true);
-    }).catchError((error) {
-      appStore.setLoading(false);
-      print(error.toString());
-    });
+    savePayment(req)
+        .then((value) {
+          appStore.setLoading(false);
+          toast(value.message.toString());
+          DashboardScreen().launch(context, isNewTask: true);
+        })
+        .catchError((error) {
+          appStore.setLoading(false);
+          print(error.toString());
+        });
   }
 
   @override
   void setState(fn) {
     if (mounted) super.setState(fn);
   }
-
 
   Future<bool> checkAndRequestLocationServices(BuildContext context) async {
     // 1️⃣ Check if location services are enabled
@@ -616,7 +642,6 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
         permission == LocationPermission.whileInUse;
   }
 
-
   void setMapFitToCenter(Set<Polyline> p) {
     double minLat = p.first.points.first.latitude;
     double minLong = p.first.points.first.longitude;
@@ -631,11 +656,15 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
         if (point.longitude > maxLong) maxLong = point.longitude;
       });
     });
-    googleMapController?.animateCamera(CameraUpdate.newLatLngBounds(
+    googleMapController?.animateCamera(
+      CameraUpdate.newLatLngBounds(
         LatLngBounds(
-            southwest: LatLng(minLat, minLong),
-            northeast: LatLng(maxLat, maxLong)),
-        20));
+          southwest: LatLng(minLat, minLong),
+          northeast: LatLng(maxLat, maxLong),
+        ),
+        20,
+      ),
+    );
   }
 
   setPolylines() async {
@@ -647,567 +676,633 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
     String origins = "${originLat},${originLong}";
     String destinations = "${destinationLat},${destinationLong}";
     await getPolylineData(origins, destinations).then((value) async {
-      if(value.status != null && value.status!){
-        if(value.polyline != null){
+      if (value.status != null && value.status!) {
+        if (value.polyline != null) {
           final points = decodePolyline(value.polyline!);
-          if(points.isNotEmpty){
+          if (points.isNotEmpty) {
             polylineCoordinates = points;
-          }else{
+          } else {
             debugPrint('---No Data--');
           }
-        }else{
+        } else {
           debugPrint('---Polyline Null---');
         }
-      }else{
+      } else {
         debugPrint('---Status False or Null---');
       }
     });
     setState(() {
       Polyline polyline = Polyline(
-          polylineId: PolylineId("poly"),
-          color: Color.fromARGB(255, 40, 122, 198),
-          width: 5,
-          points: polylineCoordinates);
+        polylineId: PolylineId("poly"),
+        color: Color.fromARGB(255, 40, 122, 198),
+        width: 5,
+        points: polylineCoordinates,
+      );
       _polylines.add(polyline);
     });
   }
 
-
-
-
   Widget createOrderWidget1() {
-    return Observer(builder: (context) {
-      return Column(
-        crossAxisAlignment: .start,
-        children: [
-          Row(
-            crossAxisAlignment: .center,
-            mainAxisAlignment: .spaceBetween,
-            children: [
-              // 🚧 Schedule controlled by Constants.kFeatureSchedule
-              scheduleOptionWidget(
-                      context, kFeatureSchedule ? isDeliverNow : true, ic_clock, language.deliveryNow)
-                  .onTap(() {
-                isDeliverNow = true;
-                setState(() {});
-              }).expand(),
-              8.width.visible(kFeatureSchedule),
-              scheduleOptionWidget(
-                      context, !isDeliverNow, ic_schedule, language.schedule)
-                  .onTap(() {
-                isDeliverNow = false;
-                setState(() {});
-              }).expand().visible(kFeatureSchedule),
-            ],
-          ),
-          16.height,
-          Row(
-            crossAxisAlignment: .center,
-            mainAxisAlignment: .spaceBetween,
-            children: [
-              enableBidOptionWidget(context, biddingSelectedOption,
-                      Icons.handshake_outlined, language.bids)
-                  .onTap(() {
-                biddingSelectedOption = !biddingSelectedOption;
-                setState(() {});
-              }).expand(),
-              const Spacer(),
-            ],
-          ).visible(appStore.isBiddingEnabled == "1"),
-          16.height,
-          Column(
-            crossAxisAlignment: .start,
-            children: [
-              Text(language.pickTime, style: boldTextStyle()),
-              16.height,
-              Container(
-                padding: .all(16),
-                decoration: BoxDecoration(
+    return Observer(
+      builder: (context) {
+        return Column(
+          crossAxisAlignment: .start,
+          children: [
+            Row(
+              crossAxisAlignment: .center,
+              mainAxisAlignment: .spaceBetween,
+              children: [
+                // 🚧 Schedule controlled by Constants.kFeatureSchedule
+                scheduleOptionWidget(
+                  context,
+                  kFeatureSchedule ? isDeliverNow : true,
+                  ic_clock,
+                  language.deliveryNow,
+                ).onTap(() {
+                  isDeliverNow = true;
+                  setState(() {});
+                }).expand(),
+                8.width.visible(kFeatureSchedule),
+                scheduleOptionWidget(
+                      context,
+                      !isDeliverNow,
+                      ic_schedule,
+                      language.schedule,
+                    )
+                    .onTap(() {
+                      isDeliverNow = false;
+                      setState(() {});
+                    })
+                    .expand()
+                    .visible(kFeatureSchedule),
+              ],
+            ),
+            16.height,
+            Row(
+              crossAxisAlignment: .center,
+              mainAxisAlignment: .spaceBetween,
+              children: [
+                enableBidOptionWidget(
+                  context,
+                  biddingSelectedOption,
+                  Icons.handshake_outlined,
+                  language.bids,
+                ).onTap(() {
+                  biddingSelectedOption = !biddingSelectedOption;
+                  setState(() {});
+                }).expand(),
+                const Spacer(),
+              ],
+            ).visible(appStore.isBiddingEnabled == "1"),
+            16.height,
+            Column(
+              crossAxisAlignment: .start,
+              children: [
+                Text(language.pickTime, style: boldTextStyle()),
+                16.height,
+                Container(
+                  padding: .all(16),
+                  decoration: BoxDecoration(
                     border: Border.all(
-                        color: ColorUtils.borderColor,
-                        width: appStore.isDarkMode ? 0.2 : 1),
-                    borderRadius: BorderRadius.circular(defaultRadius)),
-                child: Column(
-                  children: [
-                    DateTimePicker(
-                      controller: pickDateController,
-                      type: DateTimePickerType.date,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime.now().add(Duration(days: 30)),
-                      onChanged: (value) {
-                        pickDate = DateTime.parse(value);
-                        deliverDate = null;
-                        deliverDateController.clear();
-                        setState(() {});
-                      },
-                      validator: (value) {
-                        if (value!.isEmpty) return language.fieldRequiredMsg;
-                        return null;
-                      },
-                      decoration: commonInputDecoration(
-                          suffixIcon: Icons.calendar_today,
-                          hintText: language.date),
+                      color: ColorUtils.borderColor,
+                      width: appStore.isDarkMode ? 0.2 : 1,
                     ),
-                    16.height,
-                    Row(
-                      children: [
-                        DateTimePicker(
-                          controller: pickFromTimeController,
-                          type: DateTimePickerType.time,
-                          onChanged: (value) {
-                            pickFromTime = TimeOfDay.fromDateTime(
-                                DateFormat('hh:mm').parse(value));
-                            setState(() {});
-                          },
-                          validator: (value) {
-                            if (value.validate().isEmpty)
-                              return language.fieldRequiredMsg;
+                    borderRadius: BorderRadius.circular(defaultRadius),
+                  ),
+                  child: Column(
+                    children: [
+                      DateTimePicker(
+                        controller: pickDateController,
+                        type: DateTimePickerType.date,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now().add(Duration(days: 30)),
+                        onChanged: (value) {
+                          pickDate = DateTime.parse(value);
+                          deliverDate = null;
+                          deliverDateController.clear();
+                          setState(() {});
+                        },
+                        validator: (value) {
+                          if (value!.isEmpty) return language.fieldRequiredMsg;
+                          return null;
+                        },
+                        decoration: commonInputDecoration(
+                          suffixIcon: Icons.calendar_today,
+                          hintText: language.date,
+                        ),
+                      ),
+                      16.height,
+                      Row(
+                        children: [
+                          DateTimePicker(
+                            controller: pickFromTimeController,
+                            type: DateTimePickerType.time,
+                            onChanged: (value) {
+                              pickFromTime = TimeOfDay.fromDateTime(
+                                DateFormat('hh:mm').parse(value),
+                              );
+                              setState(() {});
+                            },
+                            validator: (value) {
+                              if (value.validate().isEmpty)
+                                return language.fieldRequiredMsg;
 
-                            // Check if today’s date is selected
-                            DateTime now = DateTime.now();
-                            DateTime selectedDateTime =
-                                DateFormat('hh:mm').parse(value!);
-                            DateTime selectedDateWithTime = DateTime(
+                              // Check if today’s date is selected
+                              DateTime now = DateTime.now();
+                              DateTime selectedDateTime = DateFormat(
+                                'hh:mm',
+                              ).parse(value!);
+                              DateTime selectedDateWithTime = DateTime(
                                 now.year,
                                 now.month,
                                 now.day,
                                 selectedDateTime.hour,
-                                selectedDateTime.minute);
-                            if (pickDate!.year == now.year &&
-                                pickDate!.month == now.month &&
-                                pickDate!.day == now.day) {
-                              // Add 1 hour to the current time if the selected date is today
-                              if (selectedDateWithTime
-                                  .isBefore(now.add(Duration(hours: 1)))) {
-                                return language.scheduleOrderTimeMsg;
+                                selectedDateTime.minute,
+                              );
+                              if (pickDate!.year == now.year &&
+                                  pickDate!.month == now.month &&
+                                  pickDate!.day == now.day) {
+                                // Add 1 hour to the current time if the selected date is today
+                                if (selectedDateWithTime.isBefore(
+                                  now.add(Duration(hours: 1)),
+                                )) {
+                                  return language.scheduleOrderTimeMsg;
+                                }
+                              } else {
+                                double fromTimeInHour =
+                                    pickFromTime!.hour +
+                                    pickFromTime!.minute / 60;
+                                double toTimeInHour =
+                                    pickToTime!.hour + pickToTime!.minute / 60;
+                                double difference =
+                                    toTimeInHour - fromTimeInHour;
+                                if (difference <= 0) {
+                                  return language.endTimeValidationMsg;
+                                }
                               }
-                            } else {
-                              double fromTimeInHour = pickFromTime!.hour +
+
+                              return null;
+                            },
+                            decoration: commonInputDecoration(
+                              suffixIcon: Icons.access_time,
+                              hintText: language.from,
+                            ),
+                          ).expand(),
+                          16.width,
+                          DateTimePicker(
+                            controller: pickToTimeController,
+                            type: DateTimePickerType.time,
+                            onChanged: (value) {
+                              pickToTime = TimeOfDay.fromDateTime(
+                                DateFormat('hh:mm').parse(value),
+                              );
+                              setState(() {});
+                            },
+                            validator: (value) {
+                              if (value.validate().isEmpty)
+                                return language.fieldRequiredMsg;
+                              double fromTimeInHour =
+                                  pickFromTime!.hour +
                                   pickFromTime!.minute / 60;
                               double toTimeInHour =
                                   pickToTime!.hour + pickToTime!.minute / 60;
                               double difference = toTimeInHour - fromTimeInHour;
+                              // Check if today’s date is selected
+                              DateTime now = DateTime.now();
+                              DateTime selectedDateTime = DateFormat(
+                                'hh:mm',
+                              ).parse(value!);
+                              DateTime selectedDateWithTime = DateTime(
+                                now.year,
+                                now.month,
+                                now.day,
+                                selectedDateTime.hour,
+                                selectedDateTime.minute,
+                              );
+                              if (pickDate!.year == now.year &&
+                                  pickDate!.month == now.month &&
+                                  pickDate!.day == now.day) {
+                                // Add 1 hour to the current time if the selected date is today
+                                if (selectedDateWithTime.isBefore(
+                                  now.add(Duration(hours: 1)),
+                                )) {
+                                  return language.scheduleOrderTimeMsg;
+                                }
+                              }
                               if (difference <= 0) {
                                 return language.endTimeValidationMsg;
                               }
-                            }
-
-                            return null;
-                          },
-                          decoration: commonInputDecoration(
+                              return null;
+                            },
+                            decoration: commonInputDecoration(
                               suffixIcon: Icons.access_time,
-                              hintText: language.from),
-                        ).expand(),
-                        16.width,
-                        DateTimePicker(
-                          controller: pickToTimeController,
-                          type: DateTimePickerType.time,
-                          onChanged: (value) {
-                            pickToTime = TimeOfDay.fromDateTime(
-                                DateFormat('hh:mm').parse(value));
-                            setState(() {});
-                          },
-                          validator: (value) {
-                            if (value.validate().isEmpty)
-                              return language.fieldRequiredMsg;
-                            double fromTimeInHour =
-                                pickFromTime!.hour + pickFromTime!.minute / 60;
-                            double toTimeInHour =
-                                pickToTime!.hour + pickToTime!.minute / 60;
-                            double difference = toTimeInHour - fromTimeInHour;
-                            // Check if today’s date is selected
-                            DateTime now = DateTime.now();
-                            DateTime selectedDateTime =
-                                DateFormat('hh:mm').parse(value!);
-                            DateTime selectedDateWithTime = DateTime(
-                                now.year,
-                                now.month,
-                                now.day,
-                                selectedDateTime.hour,
-                                selectedDateTime.minute);
-                            if (pickDate!.year == now.year &&
-                                pickDate!.month == now.month &&
-                                pickDate!.day == now.day) {
-                              // Add 1 hour to the current time if the selected date is today
-                              if (selectedDateWithTime
-                                  .isBefore(now.add(Duration(hours: 1)))) {
-                                return language.scheduleOrderTimeMsg;
-                              }
-                            }
-                            if (difference <= 0) {
-                              return language.endTimeValidationMsg;
-                            }
-                            return null;
-                          },
-                          decoration: commonInputDecoration(
-                              suffixIcon: Icons.access_time,
-                              hintText: language.to),
-                        ).expand()
-                      ],
-                    ),
-                  ],
+                              hintText: language.to,
+                            ),
+                          ).expand(),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              16.height,
-              Text(language.deliverTime, style: boldTextStyle()),
-              16.height,
-              Container(
-                padding: .all(16),
-                decoration: BoxDecoration(
-                  border: Border.all(
+                16.height,
+                Text(language.deliverTime, style: boldTextStyle()),
+                16.height,
+                Container(
+                  padding: .all(16),
+                  decoration: BoxDecoration(
+                    border: Border.all(
                       color: ColorUtils.borderColor,
-                      width: appStore.isDarkMode ? 0.2 : 1),
-                  borderRadius: BorderRadius.circular(defaultRadius),
-                ),
-                child: Column(
-                  children: [
-                    DateTimePicker(
-                      controller: deliverDateController,
-                      type: DateTimePickerType.date,
-                      initialDate: pickDate ?? DateTime.now(),
-                      firstDate: pickDate ?? DateTime.now(),
-                      lastDate: DateTime.now().add(Duration(days: 30)),
-                      onChanged: (value) {
-                        deliverDate = DateTime.parse(value);
-                        setState(() {});
-                      },
-                      validator: (value) {
-                        if (value!.isEmpty) return language.fieldRequiredMsg;
+                      width: appStore.isDarkMode ? 0.2 : 1,
+                    ),
+                    borderRadius: BorderRadius.circular(defaultRadius),
+                  ),
+                  child: Column(
+                    children: [
+                      DateTimePicker(
+                        controller: deliverDateController,
+                        type: DateTimePickerType.date,
+                        initialDate: pickDate ?? DateTime.now(),
+                        firstDate: pickDate ?? DateTime.now(),
+                        lastDate: DateTime.now().add(Duration(days: 30)),
+                        onChanged: (value) {
+                          deliverDate = DateTime.parse(value);
+                          setState(() {});
+                        },
+                        validator: (value) {
+                          if (value!.isEmpty) return language.fieldRequiredMsg;
 
-                        return null;
-                      },
-                      decoration: commonInputDecoration(
+                          return null;
+                        },
+                        decoration: commonInputDecoration(
                           suffixIcon: Icons.calendar_today,
-                          hintText: language.date),
+                          hintText: language.date,
+                        ),
+                      ),
+                      16.height,
+                      Row(
+                        children: [
+                          DateTimePicker(
+                            controller: deliverFromTimeController,
+                            type: DateTimePickerType.time,
+                            onChanged: (value) {
+                              deliverFromTime = TimeOfDay.fromDateTime(
+                                DateFormat('hh:mm').parse(value),
+                              );
+                              setState(() {});
+                            },
+                            validator: (value) {
+                              if (value.validate().isEmpty)
+                                return language.fieldRequiredMsg;
+                              double fromTimeInHour =
+                                  deliverFromTime!.hour +
+                                  deliverFromTime!.minute / 60;
+                              double toTimeInHour =
+                                  deliverToTime!.hour +
+                                  deliverToTime!.minute / 60;
+                              double difference = toTimeInHour - fromTimeInHour;
+                              // Check if today’s date is selected
+                              DateTime now = DateTime.now();
+                              DateTime selectedDateTime = DateFormat(
+                                'hh:mm',
+                              ).parse(value!);
+                              DateTime selectedDateWithTime = DateTime(
+                                now.year,
+                                now.month,
+                                now.day,
+                                selectedDateTime.hour,
+                                selectedDateTime.minute,
+                              );
+                              if (pickDate!.year == now.year &&
+                                  pickDate!.month == now.month &&
+                                  pickDate!.day == now.day) {
+                                // Add 1 hour to the current time if the selected date is today
+                                if (selectedDateWithTime.isBefore(
+                                  now.add(Duration(hours: 1)),
+                                )) {
+                                  return language.scheduleOrderTimeMsg;
+                                }
+                              }
+                              if (difference <= 0) {
+                                return language.endTimeValidationMsg;
+                              }
+                              return null;
+                            },
+                            decoration: commonInputDecoration(
+                              suffixIcon: Icons.access_time,
+                              hintText: language.from,
+                            ),
+                          ).expand(),
+                          16.width,
+                          DateTimePicker(
+                            controller: deliverToTimeController,
+                            type: DateTimePickerType.time,
+                            onChanged: (value) {
+                              deliverToTime = TimeOfDay.fromDateTime(
+                                DateFormat('hh:mm').parse(value),
+                              );
+                              setState(() {});
+                            },
+                            validator: (value) {
+                              if (value!.isEmpty)
+                                return language.fieldRequiredMsg;
+                              if (value.validate().isEmpty)
+                                return language.fieldRequiredMsg;
+                              double fromTimeInHour =
+                                  deliverFromTime!.hour +
+                                  deliverFromTime!.minute / 60;
+                              double toTimeInHour =
+                                  deliverToTime!.hour +
+                                  deliverToTime!.minute / 60;
+                              double difference = toTimeInHour - fromTimeInHour;
+                              // Check if today’s date is selected
+                              DateTime now = DateTime.now();
+                              DateTime selectedDateTime = DateFormat(
+                                'hh:mm',
+                              ).parse(value);
+                              DateTime selectedDateWithTime = DateTime(
+                                now.year,
+                                now.month,
+                                now.day,
+                                selectedDateTime.hour,
+                                selectedDateTime.minute,
+                              );
+                              if (deliverDate!.year == now.year &&
+                                  deliverDate!.month == now.month &&
+                                  deliverDate!.day == now.day) {
+                                // Add 1 hour to the current time if the selected date is today
+                                if (selectedDateWithTime.isBefore(
+                                  now.add(Duration(hours: 1)),
+                                )) {
+                                  return language.scheduleOrderTimeMsg;
+                                }
+                              }
+                              if (difference <= 0) {
+                                return language.endTimeValidationMsg;
+                              }
+                              return null;
+                            },
+                            decoration: commonInputDecoration(
+                              suffixIcon: Icons.access_time,
+                              hintText: language.to,
+                            ),
+                          ).expand(),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ).visible(!isDeliverNow),
+            16.height,
+
+            // Text(language.weight, style: boldTextStyle()),
+            // 8.height,
+            Row(
+              children: [
+                Text(language.weight, style: primaryTextStyle()).expand(),
+                3.width,
+                //   Text(" (${appStore.distanceUnit})", style: secondaryTextStyle()).expand(),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: ColorUtils.borderColor,
+                      width: appStore.isDarkMode ? 0.2 : 1,
                     ),
-                    16.height,
-                    Row(
+                    borderRadius: BorderRadius.circular(defaultRadius),
+                  ),
+                  child: IntrinsicHeight(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        DateTimePicker(
-                          controller: deliverFromTimeController,
-                          type: DateTimePickerType.time,
-                          onChanged: (value) {
-                            deliverFromTime = TimeOfDay.fromDateTime(
-                                DateFormat('hh:mm').parse(value));
-                            setState(() {});
-                          },
-                          validator: (value) {
-                            if (value.validate().isEmpty)
-                              return language.fieldRequiredMsg;
-                            double fromTimeInHour = deliverFromTime!.hour +
-                                deliverFromTime!.minute / 60;
-                            double toTimeInHour = deliverToTime!.hour +
-                                deliverToTime!.minute / 60;
-                            double difference = toTimeInHour - fromTimeInHour;
-                            // Check if today’s date is selected
-                            DateTime now = DateTime.now();
-                            DateTime selectedDateTime =
-                                DateFormat('hh:mm').parse(value!);
-                            DateTime selectedDateWithTime = DateTime(
-                                now.year,
-                                now.month,
-                                now.day,
-                                selectedDateTime.hour,
-                                selectedDateTime.minute);
-                            if (pickDate!.year == now.year &&
-                                pickDate!.month == now.month &&
-                                pickDate!.day == now.day) {
-                              // Add 1 hour to the current time if the selected date is today
-                              if (selectedDateWithTime
-                                  .isBefore(now.add(Duration(hours: 1)))) {
-                                return language.scheduleOrderTimeMsg;
-                              }
-                            }
-                            if (difference <= 0) {
-                              return language.endTimeValidationMsg;
-                            }
-                            return null;
-                          },
-                          decoration: commonInputDecoration(
-                              suffixIcon: Icons.access_time,
-                              hintText: language.from),
-                        ).expand(),
-                        16.width,
-                        DateTimePicker(
-                          controller: deliverToTimeController,
-                          type: DateTimePickerType.time,
-                          onChanged: (value) {
-                            deliverToTime = TimeOfDay.fromDateTime(
-                                DateFormat('hh:mm').parse(value));
-                            setState(() {});
-                          },
-                          validator: (value) {
-                            if (value!.isEmpty)
-                              return language.fieldRequiredMsg;
-                            if (value.validate().isEmpty)
-                              return language.fieldRequiredMsg;
-                            double fromTimeInHour = deliverFromTime!.hour +
-                                deliverFromTime!.minute / 60;
-                            double toTimeInHour = deliverToTime!.hour +
-                                deliverToTime!.minute / 60;
-                            double difference = toTimeInHour - fromTimeInHour;
-                            // Check if today’s date is selected
-                            DateTime now = DateTime.now();
-                            DateTime selectedDateTime =
-                                DateFormat('hh:mm').parse(value);
-                            DateTime selectedDateWithTime = DateTime(
-                                now.year,
-                                now.month,
-                                now.day,
-                                selectedDateTime.hour,
-                                selectedDateTime.minute);
-                            if (deliverDate!.year == now.year &&
-                                deliverDate!.month == now.month &&
-                                deliverDate!.day == now.day) {
-                              // Add 1 hour to the current time if the selected date is today
-                              if (selectedDateWithTime
-                                  .isBefore(now.add(Duration(hours: 1)))) {
-                                return language.scheduleOrderTimeMsg;
-                              }
-                            }
-                            if (difference <= 0) {
-                              return language.endTimeValidationMsg;
-                            }
-                            return null;
-                          },
-                          decoration: commonInputDecoration(
-                              suffixIcon: Icons.access_time,
-                              hintText: language.to),
-                        ).expand()
+                        Icon(
+                          Icons.remove,
+                          color: appStore.isDarkMode
+                              ? Colors.white
+                              : Colors.grey,
+                        ).paddingAll(12).onTap(() {
+                          if (weightController.text.toDouble() > 1) {
+                            weightController.text =
+                                (weightController.text.toDouble() - 1)
+                                    .toString();
+                          }
+                        }),
+                        VerticalDivider(
+                          thickness: 1,
+                          color: context.dividerColor,
+                        ),
+                        Container(
+                          width: 50,
+                          child: AppTextField(
+                            controller: weightController,
+                            textAlign: TextAlign.center,
+                            maxLength: 5,
+                            textFieldType: TextFieldType.PHONE,
+                            decoration: InputDecoration(
+                              counterText: '',
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: ColorUtils.colorPrimary,
+                                ),
+                              ),
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                        VerticalDivider(
+                          thickness: 1,
+                          color: context.dividerColor,
+                        ),
+                        Icon(
+                          Icons.add,
+                          color: appStore.isDarkMode
+                              ? Colors.white
+                              : Colors.grey,
+                        ).paddingAll(12).onTap(() {
+                          weightController.text =
+                              (weightController.text.toDouble() + 1).toString();
+                        }),
                       ],
                     ),
-                  ],
-                ),
-              ),
-            ],
-          ).visible(!isDeliverNow),
-          16.height,
-          // Text(language.weight, style: boldTextStyle()),
-          // 8.height,
-
-          Row(
-            children: [
-              Text(language.weight, style: primaryTextStyle()).expand(),
-              3.width,
-              //   Text(" (${appStore.distanceUnit})", style: secondaryTextStyle()).expand(),
-              Container(
-                decoration: BoxDecoration(
-                    border: Border.all(
-                        color: ColorUtils.borderColor,
-                        width: appStore.isDarkMode ? 0.2 : 1),
-                    borderRadius: BorderRadius.circular(defaultRadius)),
-                child: IntrinsicHeight(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.remove,
-                              color: appStore.isDarkMode
-                                  ? Colors.white
-                                  : Colors.grey)
-                          .paddingAll(12)
-                          .onTap(() {
-                        if (weightController.text.toDouble() > 1) {
-                          weightController.text =
-                              (weightController.text.toDouble() - 1).toString();
-                        }
-                      }),
-                      VerticalDivider(
-                          thickness: 1, color: context.dividerColor),
-                      Container(
-                        width: 50,
-                        child: AppTextField(
-                          controller: weightController,
-                          textAlign: TextAlign.center,
-                          maxLength: 5,
-                          textFieldType: TextFieldType.PHONE,
-                          decoration: InputDecoration(
-                            counterText: '',
-                            focusedBorder: UnderlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: ColorUtils.colorPrimary)),
-                            border: InputBorder.none,
-                          ),
-                        ),
-                      ),
-                      VerticalDivider(
-                          thickness: 1, color: context.dividerColor),
-                      Icon(Icons.add,
-                              color: appStore.isDarkMode
-                                  ? Colors.white
-                                  : Colors.grey)
-                          .paddingAll(12)
-                          .onTap(() {
-                        weightController.text =
-                            (weightController.text.toDouble() + 1).toString();
-                      }),
-                    ],
                   ),
                 ),
-              ),
-            ],
-          ),
-          16.height,
-          // Text(language.numberOfParcels, style: boldTextStyle()),
-          // 8.height,
-          Row(
-            children: [
-              Text(language.numberOfParcels, style: primaryTextStyle())
-                  .expand(),
-              Container(
-                decoration: BoxDecoration(
+              ],
+            ),
+            16.height,
+            // Text(language.numberOfParcels, style: boldTextStyle()),
+            // 8.height,
+            Row(
+              children: [
+                Text(
+                  language.numberOfParcels,
+                  style: primaryTextStyle(),
+                ).expand(),
+                Container(
+                  decoration: BoxDecoration(
                     border: Border.all(
-                        color: ColorUtils.borderColor,
-                        width: appStore.isDarkMode ? 0.2 : 1),
-                    borderRadius: BorderRadius.circular(defaultRadius)),
-                child: IntrinsicHeight(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.remove,
-                              color: appStore.isDarkMode
-                                  ? Colors.white
-                                  : Colors.grey)
-                          .paddingAll(12)
-                          .onTap(() {
-                        if (totalParcelController.text.toInt() > 1) {
-                          totalParcelController.text =
-                              (totalParcelController.text.toInt() - 1)
-                                  .toString();
-                        }
-                      }),
-                      VerticalDivider(
-                          thickness: 1, color: context.dividerColor),
-                      Container(
-                        width: 50,
-                        child: AppTextField(
-                          controller: totalParcelController,
-                          textAlign: TextAlign.center,
-                          maxLength: 2,
-                          textFieldType: TextFieldType.PHONE,
-                          decoration: InputDecoration(
-                            counterText: '',
-                            focusedBorder: UnderlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: ColorUtils.colorPrimary)),
-                            border: InputBorder.none,
-                          ),
-                        ),
-                      ),
-                      VerticalDivider(
-                          thickness: 1, color: context.dividerColor),
-                      Icon(Icons.add,
-                              color: appStore.isDarkMode
-                                  ? Colors.white
-                                  : Colors.grey)
-                          .paddingAll(12)
-                          .onTap(() {
-                        totalParcelController.text =
-                            (totalParcelController.text.toInt() + 1).toString();
-                      }),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          16.height,
-          Text(language.parcelType, style: primaryTextStyle()),
-          8.height,
-          AppTextField(
-            controller: parcelTypeCont,
-            textFieldType: TextFieldType.OTHER,
-            decoration: commonInputDecoration(),
-            validator: (value) {
-              if (value!.isEmpty) return language.fieldRequiredMsg;
-              return null;
-            },
-          ),
-          8.height,
-          Wrap(
-            spacing: 8,
-            runSpacing: 0,
-            children: parcelTypeList.map((item) {
-              return Chip(
-                backgroundColor: context.scaffoldBackgroundColor,
-                label: Text(item.label!, style: secondaryTextStyle()),
-                elevation: 0,
-                labelStyle: primaryTextStyle(color: Colors.grey),
-                padding: .zero,
-                labelPadding: .symmetric(horizontal: 10, vertical: 0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(defaultRadius),
-                  side: BorderSide(
                       color: ColorUtils.borderColor,
-                      width: appStore.isDarkMode ? 0.2 : 1),
-                ),
-              ).onTap(() {
-                parcelTypeCont.text = item.label!;
-                setState(() {});
-              });
-            }).toList(),
-          ),
-          16.height,
-          Row(
-            mainAxisAlignment: .spaceBetween,
-            children: [
-              Text(language.labels, style: primaryTextStyle()),
-              Icon(Icons.info,
-                      color: appStore.isDarkMode
-                          ? Colors.white.withValues(alpha:0.7)
-                          : ColorUtils.colorPrimary)
-                  .onTap(() {
-                PackagingSymbolsInfo().launch(context);
-              })
-            ],
-          ),
-          16.height,
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: packingSymbolsItems.map((item) {
-              bool isSelected = selectedPackingSymbols.contains(item);
-              return Container(
-                width: 70,
-                decoration: boxDecorationWithRoundedCorners(),
-                child: Stack(
-                  children: [
-                    Image.asset(
-                      item['image']!,
-                      width: 24,
-                      height: 24,
-                      color: appStore.isDarkMode
-                          ? Colors.white.withValues(alpha:0.7)
-                          : ColorUtils.colorPrimary,
-                    ).center().paddingAll(10),
-                    if (isSelected)
-                      Positioned(
-                        top: 0,
-                        right: 0,
-                        child: Icon(
-                          Icons.check_circle,
-                          color: Colors.green,
-                          size: 16,
+                      width: appStore.isDarkMode ? 0.2 : 1,
+                    ),
+                    borderRadius: BorderRadius.circular(defaultRadius),
+                  ),
+                  child: IntrinsicHeight(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.remove,
+                          color: appStore.isDarkMode
+                              ? Colors.white
+                              : Colors.grey,
+                        ).paddingAll(12).onTap(() {
+                          if (totalParcelController.text.toInt() > 1) {
+                            totalParcelController.text =
+                                (totalParcelController.text.toInt() - 1)
+                                    .toString();
+                          }
+                        }),
+                        VerticalDivider(
+                          thickness: 1,
+                          color: context.dividerColor,
                         ),
-                      ),
-                  ],
+                        Container(
+                          width: 50,
+                          child: AppTextField(
+                            controller: totalParcelController,
+                            textAlign: TextAlign.center,
+                            maxLength: 2,
+                            textFieldType: TextFieldType.PHONE,
+                            decoration: InputDecoration(
+                              counterText: '',
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: ColorUtils.colorPrimary,
+                                ),
+                              ),
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                        VerticalDivider(
+                          thickness: 1,
+                          color: context.dividerColor,
+                        ),
+                        Icon(
+                          Icons.add,
+                          color: appStore.isDarkMode
+                              ? Colors.white
+                              : Colors.grey,
+                        ).paddingAll(12).onTap(() {
+                          totalParcelController.text =
+                              (totalParcelController.text.toInt() + 1)
+                                  .toString();
+                        }),
+                      ],
+                    ),
+                  ),
                 ),
-              ).onTap(() {
-                setState(() {
-                  if (isSelected) {
-                    selectedPackingSymbols.remove(item);
-                  } else {
-                    selectedPackingSymbols.add(item);
-                  }
+              ],
+            ),
+            16.height,
+            Text(language.parcelType, style: primaryTextStyle()),
+            8.height,
+            AppTextField(
+              controller: parcelTypeCont,
+              textFieldType: TextFieldType.OTHER,
+              decoration: commonInputDecoration(),
+              validator: (value) {
+                if (value!.isEmpty) return language.fieldRequiredMsg;
+                return null;
+              },
+            ),
+            8.height,
+            Wrap(
+              spacing: 8,
+              runSpacing: 0,
+              children: parcelTypeList.map((item) {
+                return Chip(
+                  backgroundColor: context.scaffoldBackgroundColor,
+                  label: Text(item.label!, style: secondaryTextStyle()),
+                  elevation: 0,
+                  labelStyle: primaryTextStyle(color: Colors.grey),
+                  padding: .zero,
+                  labelPadding: .symmetric(horizontal: 10, vertical: 0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(defaultRadius),
+                    side: BorderSide(
+                      color: ColorUtils.borderColor,
+                      width: appStore.isDarkMode ? 0.2 : 1,
+                    ),
+                  ),
+                ).onTap(() {
+                  parcelTypeCont.text = item.label!;
+                  setState(() {});
                 });
+              }).toList(),
+            ),
+            16.height,
+            Row(
+              mainAxisAlignment: .spaceBetween,
+              children: [
+                Text(language.labels, style: primaryTextStyle()),
+                Icon(
+                  Icons.info,
+                  color: appStore.isDarkMode
+                      ? Colors.white.withValues(alpha: 0.7)
+                      : ColorUtils.colorPrimary,
+                ).onTap(() {
+                  PackagingSymbolsInfo().launch(context);
+                }),
+              ],
+            ),
+            16.height,
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: packingSymbolsItems.map((item) {
+                bool isSelected = selectedPackingSymbols.contains(item);
+                return Container(
+                  width: 70,
+                  decoration: boxDecorationWithRoundedCorners(),
+                  child: Stack(
+                    children: [
+                      Image.asset(
+                        item['image']!,
+                        width: 24,
+                        height: 24,
+                        color: appStore.isDarkMode
+                            ? Colors.white.withValues(alpha: 0.7)
+                            : ColorUtils.colorPrimary,
+                      ).center().paddingAll(10),
+                      if (isSelected)
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: Icon(
+                            Icons.check_circle,
+                            color: Colors.green,
+                            size: 16,
+                          ),
+                        ),
+                    ],
+                  ),
+                ).onTap(() {
+                  setState(() {
+                    if (isSelected) {
+                      selectedPackingSymbols.remove(item);
+                    } else {
+                      selectedPackingSymbols.add(item);
+                    }
+                  });
 
-                setState(() {});
-              });
-            }).toList(),
-          ),
-        ],
-      );
-    });
+                  setState(() {});
+                });
+              }).toList(),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget createOrderWidget2() {
@@ -1225,8 +1320,9 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
               textInputAction: TextInputAction.next,
               nextFocus: pickPhoneFocus,
               textFieldType: TextFieldType.MULTILINE,
-              decoration:
-                  commonInputDecoration(suffixIcon: Icons.location_on_outlined),
+              decoration: commonInputDecoration(
+                suffixIcon: Icons.location_on_outlined,
+              ),
               validator: (value) {
                 if (value!.isEmpty) return language.fieldRequiredMsg;
                 if (pickLat == null || pickLong == null)
@@ -1234,39 +1330,49 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
                 return null;
               },
               onTap: () async {
-                bool isLocationEnabledNow = await checkAndRequestLocationServices(context);
-                if (isLocationEnabledNow)  {
-                  if (getAddressData.data == null && getAddressData.data!.isEmpty) {
+                bool isLocationEnabledNow =
+                    await checkAndRequestLocationServices(context);
+                if (isLocationEnabledNow) {
+                  if (getAddressData.data == null &&
+                      getAddressData.data!.isEmpty) {
                     await showMapScreen(isPick: true, isSaveAddress: false);
-                  }
-                  else {
+                  } else {
                     showModalBottomSheet(
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(defaultRadius))),
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(defaultRadius),
+                        ),
+                      ),
                       context: context,
                       builder: (context) {
                         return PickAddressBottomSheet(
                           onAddNewAddress: () async {
                             pop();
-                            await showMapScreen(isPick: true, isSaveAddress: false);
+                            await showMapScreen(
+                              isPick: true,
+                              isSaveAddress: false,
+                            );
                           },
                           onPick: (address) {
                             pickAddressCont.text = address.address ?? "";
                             pickLat = address.latitude.toString();
                             pickLong = address.longitude.toString();
-                            pickPhoneCont.text =
-                                address.contactNumber.validate().substring(4);
+                            pickPhoneCont.text = address.contactNumber
+                                .validate()
+                                .substring(4);
                             setState(() {});
                           },
                           isPickup: true,
                         );
                       },
                     ).then((value) {
-                      addressList = (getStringListAsync(RECENT_ADDRESS_LIST) ??
-                          [])
-                          .map((e) => UseraddressDetail.fromJson(jsonDecode(e)))
-                          .toList();
+                      addressList =
+                          (getStringListAsync(RECENT_ADDRESS_LIST) ?? [])
+                              .map(
+                                (e) =>
+                                    UseraddressDetail.fromJson(jsonDecode(e)),
+                              )
+                              .toList();
                       if (addressList.isNotEmpty) {
                         pickAddressData = addressList.first;
                         deliveryAddressData = addressList.first;
@@ -1277,7 +1383,6 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
                 } else {
                   return;
                 }
-
               },
             ),
             16.height,
@@ -1289,53 +1394,60 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
               nextFocus: pickDesFocus,
               textFieldType: TextFieldType.PHONE,
               decoration: commonInputDecoration(
-                  suffixIcon: Icons.phone,
-                  prefixIcon: IntrinsicHeight(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CountryCodePicker(
-                          initialSelection: pickupCountryCode,
-                          showCountryOnly: false,
-                          dialogSize: Size(
-                              context.width() - 60, context.height() * 0.6),
-                          showFlag: true,
-                          showFlagDialog: true,
-                          showOnlyCountryWhenClosed: false,
-                          alignLeft: false,
-                          textStyle: primaryTextStyle(),
-                          dialogBackgroundColor: Theme.of(context).cardColor,
-                          barrierColor: Colors.black12,
-                          dialogTextStyle: primaryTextStyle(),
-                          searchDecoration: InputDecoration(
-                            iconColor: Theme.of(context).dividerColor,
-                            enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Theme.of(context).dividerColor)),
-                            focusedBorder: UnderlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: ColorUtils.colorPrimary)),
-                          ),
-                          searchStyle: primaryTextStyle(),
-                          onInit: (c) {
-                            pickupCountryCode = c!.dialCode!;
-                          },
-                          onChanged: (c) {
-                            pickupCountryCode = c.dialCode!;
-                          },
+                suffixIcon: Icons.phone,
+                prefixIcon: IntrinsicHeight(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CountryCodePicker(
+                        initialSelection: pickupCountryCode,
+                        showCountryOnly: false,
+                        dialogSize: Size(
+                          context.width() - 60,
+                          context.height() * 0.6,
                         ),
-                        VerticalDivider(color: Colors.grey.withValues(alpha:0.5)),
-                      ],
-                    ),
-                  )),
+                        showFlag: true,
+                        showFlagDialog: true,
+                        showOnlyCountryWhenClosed: false,
+                        alignLeft: false,
+                        textStyle: primaryTextStyle(),
+                        dialogBackgroundColor: Theme.of(context).cardColor,
+                        barrierColor: Colors.black12,
+                        dialogTextStyle: primaryTextStyle(),
+                        searchDecoration: InputDecoration(
+                          iconColor: Theme.of(context).dividerColor,
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).dividerColor,
+                            ),
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: ColorUtils.colorPrimary,
+                            ),
+                          ),
+                        ),
+                        searchStyle: primaryTextStyle(),
+                        onInit: (c) {
+                          pickupCountryCode = c!.dialCode!;
+                        },
+                        onChanged: (c) {
+                          pickupCountryCode = c.dialCode!;
+                        },
+                      ),
+                      VerticalDivider(
+                        color: Colors.grey.withValues(alpha: 0.5),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               textInputAction: TextInputAction.go,
               validator: (value) {
                 if (value!.trim().isEmpty) return language.fieldRequiredMsg;
                 return null;
               },
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-              ],
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
           ],
         ),
@@ -1394,8 +1506,9 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
               textInputAction: TextInputAction.next,
               nextFocus: deliverPhoneFocus,
               textFieldType: TextFieldType.MULTILINE,
-              decoration:
-                  commonInputDecoration(suffixIcon: Icons.location_on_outlined),
+              decoration: commonInputDecoration(
+                suffixIcon: Icons.location_on_outlined,
+              ),
               validator: (value) {
                 if (value!.isEmpty) return language.fieldRequiredMsg;
                 if (deliverLat == null || deliverLong == null)
@@ -1403,39 +1516,49 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
                 return null;
               },
               onTap: () async {
-                bool isLocationEnabledNow = await checkAndRequestLocationServices(context);
+                bool isLocationEnabledNow =
+                    await checkAndRequestLocationServices(context);
                 if (isLocationEnabledNow) {
-                  if (getAddressData.data == null && getAddressData.data!.isEmpty) {
+                  if (getAddressData.data == null &&
+                      getAddressData.data!.isEmpty) {
                     await showMapScreen(isSaveAddress: true, isPick: false);
-                  }
-                  else {
+                  } else {
                     showModalBottomSheet(
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(defaultRadius))),
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(defaultRadius),
+                        ),
+                      ),
                       context: context,
                       builder: (context) {
                         return PickAddressBottomSheet(
                           onAddNewAddress: () async {
                             pop();
-                            await showMapScreen(isPick: false, isSaveAddress: false);
+                            await showMapScreen(
+                              isPick: false,
+                              isSaveAddress: false,
+                            );
                           },
                           onPick: (address) {
                             deliverAddressCont.text = address.address ?? "";
                             deliverLat = address.latitude.toString();
                             deliverLong = address.longitude.toString();
-                            deliverPhoneCont.text =
-                                address.contactNumber.validate().substring(4);
+                            deliverPhoneCont.text = address.contactNumber
+                                .validate()
+                                .substring(4);
                             setState(() {});
                           },
                           isPickup: false,
                         );
                       },
                     ).then((value) {
-                      addressList = (getStringListAsync(RECENT_ADDRESS_LIST) ??
-                          [])
-                          .map((e) => UseraddressDetail.fromJson(jsonDecode(e)))
-                          .toList();
+                      addressList =
+                          (getStringListAsync(RECENT_ADDRESS_LIST) ?? [])
+                              .map(
+                                (e) =>
+                                    UseraddressDetail.fromJson(jsonDecode(e)),
+                              )
+                              .toList();
                       if (addressList.isNotEmpty) {
                         pickAddressData = addressList.first;
                         deliveryAddressData = addressList.first;
@@ -1466,8 +1589,10 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
                       CountryCodePicker(
                         initialSelection: deliverCountryCode,
                         showCountryOnly: false,
-                        dialogSize:
-                            Size(context.width() - 60, context.height() * 0.6),
+                        dialogSize: Size(
+                          context.width() - 60,
+                          context.height() * 0.6,
+                        ),
                         showFlag: true,
                         showFlagDialog: true,
                         showOnlyCountryWhenClosed: false,
@@ -1479,11 +1604,15 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
                         searchDecoration: InputDecoration(
                           iconColor: Theme.of(context).dividerColor,
                           enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Theme.of(context).dividerColor)),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).dividerColor,
+                            ),
+                          ),
                           focusedBorder: UnderlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: ColorUtils.colorPrimary)),
+                            borderSide: BorderSide(
+                              color: ColorUtils.colorPrimary,
+                            ),
+                          ),
                         ),
                         searchStyle: primaryTextStyle(),
                         onInit: (c) {
@@ -1493,7 +1622,9 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
                           deliverCountryCode = c.dialCode!;
                         },
                       ),
-                      VerticalDivider(color: Colors.grey.withValues(alpha:0.5)),
+                      VerticalDivider(
+                        color: Colors.grey.withValues(alpha: 0.5),
+                      ),
                     ],
                   ),
                 ),
@@ -1570,9 +1701,10 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
                   mapType: MapType.normal,
                   cameraTargetBounds: CameraTargetBounds.unbounded,
                   initialCameraPosition: CameraPosition(
-                      bearing: 192.8334901395799,
-                      target: LatLng(pickLat.toDouble(), pickLong.toDouble()),
-                      zoom: 12),
+                    bearing: 192.8334901395799,
+                    target: LatLng(pickLat.toDouble(), pickLong.toDouble()),
+                    zoom: 12,
+                  ),
                   onMapCreated: onMapCreated,
                   tiltGesturesEnabled: true,
                   scrollGesturesEnabled: true,
@@ -1602,44 +1734,50 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
             padding: .all(16),
             decoration: boxDecorationWithRoundedCorners(
               borderRadius: BorderRadius.circular(defaultRadius),
-              border:
-                  Border.all(color: ColorUtils.colorPrimary.withValues(alpha:0.2)),
+              border: Border.all(
+                color: ColorUtils.colorPrimary.withValues(alpha: 0.2),
+              ),
               backgroundColor: Colors.transparent,
             ),
             child: Column(
               crossAxisAlignment: .start,
               children: [
                 rowWidget(
-                    title: language.parcelType, value: parcelTypeCont.text),
+                  title: language.parcelType,
+                  value: parcelTypeCont.text,
+                ),
                 8.height,
                 rowWidget(
-                    title: language.weight,
-                    value:
-                        '${weightController.text} ${CountryModel.fromJson(getJSONAsync(COUNTRY_DATA)).weightType}'),
+                  title: language.weight,
+                  value:
+                      '${weightController.text} ${CountryModel.fromJson(getJSONAsync(COUNTRY_DATA)).weightType}',
+                ),
                 8.height,
                 rowWidget(
-                    title: language.numberOfParcels,
-                    value: '${totalParcelController.text}'),
+                  title: language.numberOfParcels,
+                  value: '${totalParcelController.text}',
+                ),
               ],
             ),
           ),
           16.height,
           addressComponent(
-              title: language.pickupLocation,
-              address: pickAddressCont.text,
-              phoneNumber: '$pickupCountryCode ${pickPhoneCont.text.trim()}',
-              personName: pickPersonNameCont.text,
-              information: pickDesCont.text,
-              instruction: pickInstructionCont.text),
+            title: language.pickupLocation,
+            address: pickAddressCont.text,
+            phoneNumber: '$pickupCountryCode ${pickPhoneCont.text.trim()}',
+            personName: pickPersonNameCont.text,
+            information: pickDesCont.text,
+            instruction: pickInstructionCont.text,
+          ),
           16.height,
           addressComponent(
-              title: language.deliveryLocation,
-              address: deliverAddressCont.text,
-              phoneNumber:
-                  '$deliverCountryCode ${deliverPhoneCont.text.trim()}',
-              personName: deliverPersonNameCont.text,
-              information: deliverDesCont.text,
-              instruction: deliverInstructionCont.text),
+            title: language.deliveryLocation,
+            address: deliverAddressCont.text,
+            phoneNumber: '$deliverCountryCode ${deliverPhoneCont.text.trim()}',
+            personName: deliverPersonNameCont.text,
+            information: deliverDesCont.text,
+            instruction: deliverInstructionCont.text,
+          ),
           Visibility(
             visible: appStore.isVehicleOrder != 0,
             child: Column(
@@ -1668,9 +1806,10 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
                           mainAxisAlignment: .start,
                           children: [
                             commonCachedNetworkImage(
-                                item.vehicleImage.validate(),
-                                height: 40,
-                                width: 40),
+                              item.vehicleImage.validate(),
+                              height: 40,
+                              width: 40,
+                            ),
                             SizedBox(width: 16),
                             Column(
                               crossAxisAlignment: .start,
@@ -1684,7 +1823,7 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
                                     maxLines: 4,
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                )
+                                ),
                               ],
                             ),
                           ],
@@ -1712,23 +1851,32 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
             mainAxisAlignment: .spaceBetween,
             children: [
               Text(language.insurance, style: boldTextStyle()),
-              Icon(Icons.info, color: ColorUtils.themeColor).onTap(() {
-                InsuranceDetailsScreen(appStore.insuranceDescription)
-                    .launch(context);
-              }).visible(!appStore.insuranceDescription.isEmptyOrNull)
+              Icon(Icons.info, color: ColorUtils.themeColor)
+                  .onTap(() {
+                    InsuranceDetailsScreen(
+                      appStore.insuranceDescription,
+                    ).launch(context);
+                  })
+                  .visible(!appStore.insuranceDescription.isEmptyOrNull),
             ],
           ).visible(appStore.isInsuranceAllowed == "1"),
           16.height.visible(appStore.isInsuranceAllowed == "1"),
-          InsuranceOptionsWidget(0, language.addCourierInsurance)
-              .visible(appStore.isInsuranceAllowed == "1"),
+          InsuranceOptionsWidget(
+            0,
+            language.addCourierInsurance,
+          ).visible(appStore.isInsuranceAllowed == "1"),
           16.height.visible(appStore.isInsuranceAllowed == "1"),
-          InsuranceOptionsWidget(1, language.noThanksRisk)
-              .visible(appStore.isInsuranceAllowed == "1"),
+          InsuranceOptionsWidget(
+            1,
+            language.noThanksRisk,
+          ).visible(appStore.isInsuranceAllowed == "1"),
           16.height.visible(insuranceSelectedOption == 0),
           if (appStore.isInsuranceAllowed == "1") ...[
             12.height,
-            Text(language.approxParcelValue, style: primaryTextStyle())
-                .visible(insuranceSelectedOption == 0),
+            Text(
+              language.approxParcelValue,
+              style: primaryTextStyle(),
+            ).visible(insuranceSelectedOption == 0),
             9.height,
             AppTextField(
               controller: insuranceAmountController,
@@ -1736,7 +1884,8 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
               decoration: commonInputDecoration(isFill: false),
               onChanged: (val) async {
                 if (!val.isEmptyOrNull) {
-                  insuranceAmount = (double.parse(val) *
+                  insuranceAmount =
+                      (double.parse(val) *
                           appStore.insurancePercentage.toDouble()) /
                       100;
                   await getTotalForOrder();
@@ -1749,7 +1898,8 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
               },
               onFieldSubmitted: (val) async {
                 if (!val.isEmptyOrNull) {
-                  insuranceAmount = (double.parse(val) *
+                  insuranceAmount =
+                      (double.parse(val) *
                           appStore.insurancePercentage.toDouble()) /
                       100;
                   await getTotalForOrder();
@@ -1778,9 +1928,10 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
                 decoration: boxDecorationWithRoundedCorners(
                   borderRadius: BorderRadius.circular(defaultRadius),
                   border: Border.all(
-                      color: ColorUtils.colorPrimary.withValues(alpha:0.2)),
+                    color: ColorUtils.colorPrimary.withValues(alpha: 0.2),
+                  ),
                   backgroundColor: isAppliedCoupon
-                      ? Colors.grey.withValues(alpha:0.5)
+                      ? Colors.grey.withValues(alpha: 0.5)
                       : Colors.transparent,
                 ),
                 child: Column(
@@ -1806,7 +1957,8 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
                                       style: boldTextStyle(
-                                          color: ColorUtils.colorPrimary),
+                                        color: ColorUtils.colorPrimary,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -1843,35 +1995,38 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
                       ],
                     ).paddingAll(16),
                     10.height.visible(selectedCoupon == null ? false : true),
-                    Divider(color: Colors.grey.withValues(alpha:0.3), height: 0.5)
-                        .visible(selectedCoupon == null ? false : true),
+                    Divider(
+                      color: Colors.grey.withValues(alpha: 0.3),
+                      height: 0.5,
+                    ).visible(selectedCoupon == null ? false : true),
                     Row(
-                      mainAxisAlignment: .center,
-                      children: [
-                        Text("${language.moreCoupons}",
-                            style: primaryTextStyle(size: 16)),
-                        Icon(
-                          Icons.navigate_next,
-                          size: 18,
+                          mainAxisAlignment: .center,
+                          children: [
+                            Text(
+                              "${language.moreCoupons}",
+                              style: primaryTextStyle(size: 16),
+                            ),
+                            Icon(Icons.navigate_next, size: 18),
+                          ],
                         )
-                      ],
-                    )
                         .paddingAll(8)
                         .visible(selectedCoupon == null ? false : true)
-                        .onTap(isAppliedCoupon
-                            ? null
-                            : () {
-                                CouponListScreen()
-                                    .launch(context)
-                                    .then((result) {
-                                  if (result != null) {
-                                    selectedCoupon = result;
-                                    setState(() {});
-                                  }
+                        .onTap(
+                          isAppliedCoupon
+                              ? null
+                              : () {
+                                  CouponListScreen().launch(context).then((
+                                    result,
+                                  ) {
+                                    if (result != null) {
+                                      selectedCoupon = result;
+                                      setState(() {});
+                                    }
 
-                                  setState(() {});
-                                });
-                              }),
+                                    setState(() {});
+                                  });
+                                },
+                        ),
                   ],
                 ),
               ),
@@ -1881,27 +2036,28 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
           16.height,
           if (totalAmountResponse != null) ...[
             OrderAmountDataWidget(
-                fixedAmount: totalAmountResponse!.fixedAmount!.toDouble(),
-                distanceAmount: totalAmountResponse!.distanceAmount!.toDouble(),
-                extraCharges: totalAmountResponse!.extraCharges!,
-                vehicleAmount: totalAmountResponse!.vehicleAmount!.toDouble(),
-                insuranceAmount: insuranceAmount.toDouble(),
-                diffWeight: totalAmountResponse!.diffWeight!.toDouble(),
-                diffDistance: totalAmountResponse!.diffDistance!.toDouble(),
-                totalAmount: totalAmountResponse!.totalAmount!.toDouble(),
-                weightAmount: totalAmountResponse!.weightAmount!.toDouble(),
-                perWeightCharge: cityData!.perWeightCharges!.toDouble(),
-                perKmCityDataCharge: cityData!.perDistanceCharges!.toDouble(),
-                coupon: selectedCoupon ?? null,
-                isAppliedCoupon: isAppliedCoupon,
-                perkmVehiclePrice: vehicleList.isNotEmpty ? vehicleList
-                    .firstWhere((element) => element.id == selectedVehicle)
-                    .perKmCharge!
-                    .toDouble() : 0.00,
-                baseTotal: totalAmountResponse!.baseTotal!.toDouble()),
+              fixedAmount: totalAmountResponse!.fixedAmount!.toDouble(),
+              distanceAmount: totalAmountResponse!.distanceAmount!.toDouble(),
+              extraCharges: totalAmountResponse!.extraCharges!,
+              vehicleAmount: totalAmountResponse!.vehicleAmount!.toDouble(),
+              insuranceAmount: insuranceAmount.toDouble(),
+              diffWeight: totalAmountResponse!.diffWeight!.toDouble(),
+              diffDistance: totalAmountResponse!.diffDistance!.toDouble(),
+              totalAmount: totalAmountResponse!.totalAmount!.toDouble(),
+              weightAmount: totalAmountResponse!.weightAmount!.toDouble(),
+              perWeightCharge: cityData!.perWeightCharges!.toDouble(),
+              perKmCityDataCharge: cityData!.perDistanceCharges!.toDouble(),
+              coupon: selectedCoupon ?? null,
+              isAppliedCoupon: isAppliedCoupon,
+              perkmVehiclePrice: vehicleList.isNotEmpty
+                  ? vehicleList
+                        .firstWhere((element) => element.id == selectedVehicle)
+                        .perKmCharge!
+                        .toDouble()
+                  : 0.00,
+              baseTotal: totalAmountResponse!.baseTotal!.toDouble(),
+            ),
           ],
-
-
 
           16.height,
           Text(language.payment, style: boldTextStyle()),
@@ -1912,30 +2068,37 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
             children: mPaymentList.map((mData) {
               return Container(
                 width: (context.width() - 48) / 3,
-                padding: .all(8),
+                padding: .all(4),
                 alignment: Alignment.center,
                 decoration: boxDecorationWithRoundedCorners(
-                    border: Border.all(
-                        color: isSelected == mData.index
-                            ? ColorUtils.colorPrimary
-                            : ColorUtils.borderColor),
-                    backgroundColor: Colors.transparent),
+                  border: Border.all(
+                    color: isSelected == mData.index
+                        ? ColorUtils.colorPrimary
+                        : ColorUtils.borderColor,
+                  ),
+                  backgroundColor: Colors.transparent,
+                ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: .center,
                   mainAxisAlignment: .center,
                   children: [
-                    ImageIcon(AssetImage(mData.image.validate()),
-                        size: 20,
+                    ImageIcon(
+                      AssetImage(mData.image.validate()),
+                      size: 20,
+                      color: isSelected == mData.index
+                          ? ColorUtils.colorPrimary
+                          : ColorUtils.dividerColor,
+                    ),
+                    8.width,
+                    Text(
+                      mData.title!,
+                      style: primaryTextStyle(
                         color: isSelected == mData.index
                             ? ColorUtils.colorPrimary
-                            : ColorUtils.dividerColor),
-                    8.width,
-                    Text(mData.title!,
-                        style: primaryTextStyle(
-                            color: isSelected == mData.index
-                                ? ColorUtils.colorPrimary
-                                : textSecondaryColorGlobal)),
+                            : textSecondaryColorGlobal,
+                      ),
+                    ),
                   ],
                 ),
               ).onTap(() {
@@ -1957,13 +2120,21 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
                 decoration: commonInputDecoration(),
                 items: [
                   DropdownMenuItem(
-                      value: PAYMENT_ON_PICKUP,
-                      child: Text(language.pickupLocation,
-                          style: primaryTextStyle(), maxLines: 1)),
+                    value: PAYMENT_ON_PICKUP,
+                    child: Text(
+                      language.pickupLocation,
+                      style: primaryTextStyle(),
+                      maxLines: 1,
+                    ),
+                  ),
                   DropdownMenuItem(
-                      value: PAYMENT_ON_DELIVERY,
-                      child: Text(language.deliveryLocation,
-                          style: primaryTextStyle(), maxLines: 1)),
+                    value: PAYMENT_ON_DELIVERY,
+                    child: Text(
+                      language.deliveryLocation,
+                      style: primaryTextStyle(),
+                      maxLines: 1,
+                    ),
+                  ),
                 ],
                 onChanged: (value) {
                   paymentCollectFrom = value!;
@@ -1977,18 +2148,21 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
     );
   }
 
-
-
-  Future<void> showMapScreen({required bool isPick, required bool isSaveAddress}) async {
+  Future<void> showMapScreen({
+    required bool isPick,
+    required bool isSaveAddress,
+  }) async {
     try {
-      PlaceAddressModel res =
-          await GoogleMapScreen(isSaveAddress: isSaveAddress, isPick: isPick).launch(context);
+      PlaceAddressModel res = await GoogleMapScreen(
+        isSaveAddress: isSaveAddress,
+        isPick: isPick,
+      ).launch(context);
       if (mounted) {
-        if(isPick){
+        if (isPick) {
           pickAddressCont.text = res.placeAddress ?? "";
           pickLat = res.latitude.toString();
           pickLong = res.longitude.toString();
-        }else{
+        } else {
           deliverAddressCont.text = res.placeAddress ?? "";
           deliverLat = res.latitude.toString();
           deliverLong = res.longitude.toString();
@@ -2005,7 +2179,7 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
       decoration: boxDecorationWithRoundedCorners(
         backgroundColor: insuranceSelectedOption == value
             ? ColorUtils.colorPrimary
-            : Colors.grey.withValues(alpha:0.1),
+            : Colors.grey.withValues(alpha: 0.1),
       ),
       child: Row(
         children: [
@@ -2015,14 +2189,14 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
             onChanged: (int? newValue) {
               _onOptionSelected(newValue);
             },
-            fillColor: WidgetStateProperty.resolveWith<Color?>(
-              (Set<WidgetState> states) {
-                if (states.contains(WidgetState.selected)) {
-                  return Colors.white;
-                }
-                return ColorUtils.colorPrimary;
-              },
-            ),
+            fillColor: WidgetStateProperty.resolveWith<Color?>((
+              Set<WidgetState> states,
+            ) {
+              if (states.contains(WidgetState.selected)) {
+                return Colors.white;
+              }
+              return ColorUtils.colorPrimary;
+            }),
             activeColor: Colors.white,
           ),
           SizedBox(width: 8),
@@ -2041,7 +2215,7 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
                 Text(
                   "${appStore.insurancePercentage} ${language.ofApproxParcelValue}",
                   style: secondaryTextStyle(
-                    color: Colors.white.withValues(alpha:0.5),
+                    color: Colors.white.withValues(alpha: 0.5),
                     size: 13,
                   ),
                 ),
@@ -2076,12 +2250,13 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
       children: [
         Text(title, style: secondaryTextStyle()),
         16.width,
-        Text(value,
-                style: boldTextStyle(size: 14),
-                maxLines: 3,
-                textAlign: TextAlign.end,
-                overflow: TextOverflow.ellipsis)
-            .expand(),
+        Text(
+          value,
+          style: boldTextStyle(size: 14),
+          maxLines: 3,
+          textAlign: TextAlign.end,
+          overflow: TextOverflow.ellipsis,
+        ).expand(),
       ],
     );
   }
@@ -2101,9 +2276,9 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
           mainAxisAlignment: .spaceBetween,
           children: [
             Text(title, style: boldTextStyle()),
-            Text(language.viewMore, style: secondaryTextStyle(size: 12))
-                .onTap(() {
-              showDialog(
+            Text(language.viewMore, style: secondaryTextStyle(size: 12)).onTap(
+              () {
+                showDialog(
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
@@ -2111,18 +2286,20 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
                       title: Column(
                         children: [
                           Row(
-                              mainAxisAlignment: .spaceBetween,
-                              children: [
-                                Text(language.details, style: boldTextStyle()),
-                                Icon(Icons.close, size: 20).onTap(() {
-                                  pop();
-                                })
-                              ]),
+                            mainAxisAlignment: .spaceBetween,
+                            children: [
+                              Text(language.details, style: boldTextStyle()),
+                              Icon(Icons.close, size: 20).onTap(() {
+                                pop();
+                              }),
+                            ],
+                          ),
                           10.height,
                           Divider(
-                              height: 1,
-                              thickness: 1,
-                              color: Colors.grey.withValues(alpha:0.5))
+                            height: 1,
+                            thickness: 1,
+                            color: Colors.grey.withValues(alpha: 0.5),
+                          ),
                         ],
                       ),
                       content: Column(
@@ -2131,8 +2308,10 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
                           Row(
                             mainAxisAlignment: .spaceBetween,
                             children: [
-                              Text("${language.contactPersonName} :",
-                                  style: secondaryTextStyle()),
+                              Text(
+                                "${language.contactPersonName} :",
+                                style: secondaryTextStyle(),
+                              ),
                               Text(personName, style: boldTextStyle()),
                             ],
                           ),
@@ -2140,8 +2319,10 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
                           Row(
                             mainAxisAlignment: .spaceBetween,
                             children: [
-                              Text("${language.information} :",
-                                  style: secondaryTextStyle()),
+                              Text(
+                                "${language.information} :",
+                                style: secondaryTextStyle(),
+                              ),
                               Text(information, style: boldTextStyle()),
                             ],
                           ),
@@ -2149,16 +2330,20 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
                           Row(
                             mainAxisAlignment: .spaceBetween,
                             children: [
-                              Text("${language.instruction}",
-                                  style: secondaryTextStyle()),
+                              Text(
+                                "${language.instruction}",
+                                style: secondaryTextStyle(),
+                              ),
                               Text(instruction, style: boldTextStyle()),
                             ],
                           ),
                         ],
                       ),
                     );
-                  });
-            }),
+                  },
+                );
+              },
+            ),
           ],
         ),
         8.height,
@@ -2167,7 +2352,9 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
           padding: .all(16),
           decoration: boxDecorationWithRoundedCorners(
             borderRadius: BorderRadius.circular(defaultRadius),
-            border: Border.all(color: ColorUtils.colorPrimary.withValues(alpha:0.2)),
+            border: Border.all(
+              color: ColorUtils.colorPrimary.withValues(alpha: 0.2),
+            ),
             backgroundColor: Colors.transparent,
           ),
           child: Column(
@@ -2179,8 +2366,10 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
                 children: [
                   Icon(Icons.call, size: 14),
                   8.width,
-                  Text(phoneNumber, style: secondaryTextStyle())
-                      .visible(phoneNumber.isNotEmpty),
+                  Text(
+                    phoneNumber,
+                    style: secondaryTextStyle(),
+                  ).visible(phoneNumber.isNotEmpty),
                 ],
               ),
             ],
@@ -2194,12 +2383,15 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
     return CircularPercentIndicator(
       radius: 20.0,
       lineWidth: 2.0,
-      percent:
-          ((selectedTabIndex + 1) / 5) > 1 ? 1 : (selectedTabIndex + 1) / 5,
+      percent: ((selectedTabIndex + 1) / 5) > 1
+          ? 1
+          : (selectedTabIndex + 1) / 5,
       animation: true,
-      center: Text((selectedTabIndex + 1).toInt().toString() + " /5",
-          style: boldTextStyle(size: 11, color: Colors.white)),
-      backgroundColor: Colors.white.withValues(alpha:0.25),
+      center: Text(
+        (selectedTabIndex + 1).toInt().toString() + " /5",
+        style: boldTextStyle(size: 11, color: Colors.white),
+      ),
+      backgroundColor: Colors.white.withValues(alpha: 0.25),
       progressColor: Colors.white,
     );
   }
@@ -2241,20 +2433,16 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
       },
       child: CommonScaffoldComponent(
         // appBarTitle: language.createOrder,
-
-        appBar: commonAppBarWidget(appBarTitleList[selectedTabIndex], actions: [
-          Row(
-            children: [
-              progressIndicator(),
-              10.width,
-            ],
-          )
-        ]),
+        appBar: commonAppBarWidget(
+          appBarTitleList[selectedTabIndex],
+          actions: [
+            Row(children: [progressIndicator(), 10.width]),
+          ],
+        ),
         body: Stack(
           children: [
             SingleChildScrollView(
-              padding:
-                  .only(left: 16, top: 20, right: 16, bottom: 16),
+              padding: .only(left: 16, top: 20, right: 16, bottom: 16),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -2280,147 +2468,173 @@ class CreateOrderScreenState extends State<CreateOrderScreen> {
             children: [
               if (selectedTabIndex != 0)
                 outlineButton(language.previous, () {
-                  FocusScope.of(context).requestFocus(new FocusNode());
-                  selectedTabIndex--;
-                  setState(() {});
-                }, color: ColorUtils.colorPrimary)
+                      FocusScope.of(context).requestFocus(new FocusNode());
+                      selectedTabIndex--;
+                      setState(() {});
+                    }, color: ColorUtils.colorPrimary)
                     .paddingRight(isRTL ? 4 : 16)
                     .paddingLeft(isRTL ? 16 : 0)
                     .expand(),
               commonButton(
-                  selectedTabIndex != 4 ? language.next : language.createOrder,
-                  () async {
-                FocusScope.of(context).requestFocus(new FocusNode());
-                log('------selected tab index${selectedTabIndex}');
-                if (selectedTabIndex == 2) {
-                  markers.clear();
-                  markers.add(
-                    Marker(
-                      markerId: MarkerId("1"),
-                      position: LatLng(pickLat.toDouble(), pickLong.toDouble()),
-                      infoWindow: InfoWindow(title: language.sourceLocation),
-                      icon: BitmapDescriptor.defaultMarkerWithHue(
-                          BitmapDescriptor.hueRed),
-                    ),
-                  );
-                  markers.add(
-                    Marker(
-                      markerId: MarkerId("2"),
-                      position:
-                          LatLng(deliverLat.toDouble(), deliverLong.toDouble()),
-                      infoWindow:
-                          InfoWindow(title: language.destinationLocation),
-                      icon: BitmapDescriptor.defaultMarkerWithHue(
-                          BitmapDescriptor.hueRed),
-                    ),
-                  );
-                  getDistance();
-                  setState(() {});
-                }
-                if (selectedTabIndex != 4) {
-                  if (_formKey.currentState!.validate()) {
-                    Duration difference = Duration();
-                    Duration differenceCurrentTime = Duration();
-                    if (!isDeliverNow) {
-                      pickFromDateTime = pickDate!.add(Duration(
-                          hours: pickFromTime!.hour,
-                          minutes: pickFromTime!.minute));
-                      pickToDateTime = pickDate!.add(Duration(
-                          hours: pickToTime!.hour,
-                          minutes: pickToTime!.minute));
-                      deliverFromDateTime = deliverDate!.add(Duration(
-                          hours: deliverFromTime!.hour,
-                          minutes: deliverFromTime!.minute));
-                      deliverToDateTime = deliverDate!.add(Duration(
-                          hours: deliverToTime!.hour,
-                          minutes: deliverToTime!.minute));
-                      difference =
-                          pickFromDateTime!.difference(deliverFromDateTime!);
-                      differenceCurrentTime =
-                          DateTime.now().difference(pickFromDateTime!);
-                    }
-                    if (differenceCurrentTime.inMinutes > 0)
-                      return toast(language.pickupCurrentValidationMsg);
-                    if (difference.inMinutes > 0)
-                      return toast(language.pickupDeliverValidationMsg);
-                    selectedTabIndex++;
-                    if (selectedTabIndex == 4) {
-                      //  await getTotalAmount();
-                    }
+                selectedTabIndex != 4 ? language.next : language.createOrder,
+                () async {
+                  FocusScope.of(context).requestFocus(new FocusNode());
+                  log('------selected tab index${selectedTabIndex}');
+                  if (selectedTabIndex == 2) {
+                    markers.clear();
+                    markers.add(
+                      Marker(
+                        markerId: MarkerId("1"),
+                        position: LatLng(
+                          pickLat.toDouble(),
+                          pickLong.toDouble(),
+                        ),
+                        infoWindow: InfoWindow(title: language.sourceLocation),
+                        icon: BitmapDescriptor.defaultMarkerWithHue(
+                          BitmapDescriptor.hueRed,
+                        ),
+                      ),
+                    );
+                    markers.add(
+                      Marker(
+                        markerId: MarkerId("2"),
+                        position: LatLng(
+                          deliverLat.toDouble(),
+                          deliverLong.toDouble(),
+                        ),
+                        infoWindow: InfoWindow(
+                          title: language.destinationLocation,
+                        ),
+                        icon: BitmapDescriptor.defaultMarkerWithHue(
+                          BitmapDescriptor.hueRed,
+                        ),
+                      ),
+                    );
+                    getDistance();
                     setState(() {});
                   }
-                } else {
-                  if (insuranceSelectedOption == 0 &&
-                      insuranceAmountController.text.isEmptyOrNull) {
-                    toast(language.insuranceAmountValidation);
-                    return;
-                  }
-                  if (isSelected == 3 &&
-                      //      (appStore.availableBal < (totalAmountResponse!.totalAmount! + insuranceAmount))) {
-                      (appStore.availableBal <
-                          (totalAmountResponse!.totalAmount! +
-                              insuranceAmount))) {
-                    showInDialog(
-                      getContext,
-                      contentPadding: .all(16),
-                      builder: (p0) {
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(language.balanceInsufficientCashPayment,
-                                style: primaryTextStyle(size: 16),
-                                textAlign: TextAlign.center),
-                            30.height,
-                            Row(
-                              children: [
-                                commonButton(language.cancel, () {
-                                  finish(getContext, 0);
-                                }).expand(),
-                                6.width,
-                                commonButton(language.process, () {
-                                  //      if (appStore.isInsuranceAllowed == true && insuranceSelectedOption == 0)
-                                  // createOrderApiCall(ORDER_CREATED);
-                                  // finish(getContext, 1);
-                                  showConfirmDialogCustom(
-                                    context,
-                                    title: language.createOrderConfirmationMsg,
-                                    note: language
-                                        .pleaseAvoidSendingProhibitedItems,
-                                    positiveText: language.yes,
-                                    primaryColor: ColorUtils.colorPrimary,
-                                    negativeText: language.no,
-                                    onAccept: (v) {
-                                      createOrderApiCall(ORDER_CREATED);
-                                      finish(getContext);
-                                    },
-                                  );
-                                }).expand(),
-                                6.width,
-                                commonButton(language.draft, () {
-                                  createOrderApiCall(ORDER_DRAFT);
-                                  finish(getContext, 2);
-                                }).expand(),
-                              ],
-                            ),
-                          ],
+                  if (selectedTabIndex != 4) {
+                    if (_formKey.currentState!.validate()) {
+                      Duration difference = Duration();
+                      Duration differenceCurrentTime = Duration();
+                      if (!isDeliverNow) {
+                        pickFromDateTime = pickDate!.add(
+                          Duration(
+                            hours: pickFromTime!.hour,
+                            minutes: pickFromTime!.minute,
+                          ),
                         );
-                      },
-                    );
+                        pickToDateTime = pickDate!.add(
+                          Duration(
+                            hours: pickToTime!.hour,
+                            minutes: pickToTime!.minute,
+                          ),
+                        );
+                        deliverFromDateTime = deliverDate!.add(
+                          Duration(
+                            hours: deliverFromTime!.hour,
+                            minutes: deliverFromTime!.minute,
+                          ),
+                        );
+                        deliverToDateTime = deliverDate!.add(
+                          Duration(
+                            hours: deliverToTime!.hour,
+                            minutes: deliverToTime!.minute,
+                          ),
+                        );
+                        difference = pickFromDateTime!.difference(
+                          deliverFromDateTime!,
+                        );
+                        differenceCurrentTime = DateTime.now().difference(
+                          pickFromDateTime!,
+                        );
+                      }
+                      if (differenceCurrentTime.inMinutes > 0)
+                        return toast(language.pickupCurrentValidationMsg);
+                      if (difference.inMinutes > 0)
+                        return toast(language.pickupDeliverValidationMsg);
+                      selectedTabIndex++;
+                      if (selectedTabIndex == 4) {
+                        //  await getTotalAmount();
+                      }
+                      setState(() {});
+                    }
                   } else {
-                    showConfirmDialogCustom(
-                      context,
-                      title: language.createOrderConfirmationMsg,
-                      note: language.pleaseAvoidSendingProhibitedItems,
-                      positiveText: language.yes,
-                      primaryColor: ColorUtils.colorPrimary,
-                      negativeText: language.no,
-                      onAccept: (v) {
-                        createOrderApiCall(ORDER_CREATED);
-                      },
-                    );
+                    if (insuranceSelectedOption == 0 &&
+                        insuranceAmountController.text.isEmptyOrNull) {
+                      toast(language.insuranceAmountValidation);
+                      return;
+                    }
+                    if (isSelected == 3 &&
+                        //      (appStore.availableBal < (totalAmountResponse!.totalAmount! + insuranceAmount))) {
+                        (appStore.availableBal <
+                            (totalAmountResponse!.totalAmount! +
+                                insuranceAmount))) {
+                      showInDialog(
+                        getContext,
+                        contentPadding: .all(16),
+                        builder: (p0) {
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                language.balanceInsufficientCashPayment,
+                                style: primaryTextStyle(size: 16),
+                                textAlign: TextAlign.center,
+                              ),
+                              30.height,
+                              Row(
+                                children: [
+                                  commonButton(language.cancel, () {
+                                    finish(getContext, 0);
+                                  }).expand(),
+                                  6.width,
+                                  commonButton(language.process, () {
+                                    //      if (appStore.isInsuranceAllowed == true && insuranceSelectedOption == 0)
+                                    // createOrderApiCall(ORDER_CREATED);
+                                    // finish(getContext, 1);
+                                    showConfirmDialogCustom(
+                                      context,
+                                      title:
+                                          language.createOrderConfirmationMsg,
+                                      note: language
+                                          .pleaseAvoidSendingProhibitedItems,
+                                      positiveText: language.yes,
+                                      primaryColor: ColorUtils.colorPrimary,
+                                      negativeText: language.no,
+                                      onAccept: (v) {
+                                        createOrderApiCall(ORDER_CREATED);
+                                        finish(getContext);
+                                      },
+                                    );
+                                  }).expand(),
+                                  6.width,
+                                  commonButton(language.draft, () {
+                                    createOrderApiCall(ORDER_DRAFT);
+                                    finish(getContext, 2);
+                                  }).expand(),
+                                ],
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    } else {
+                      showConfirmDialogCustom(
+                        context,
+                        title: language.createOrderConfirmationMsg,
+                        note: language.pleaseAvoidSendingProhibitedItems,
+                        positiveText: language.yes,
+                        primaryColor: ColorUtils.colorPrimary,
+                        negativeText: language.no,
+                        onAccept: (v) {
+                          createOrderApiCall(ORDER_CREATED);
+                        },
+                      );
+                    }
                   }
-                }
-              }).expand()
+                },
+              ).expand(),
             ],
           ),
         ),

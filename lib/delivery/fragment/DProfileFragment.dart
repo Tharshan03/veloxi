@@ -85,16 +85,18 @@ class DProfileFragmentState extends State<DProfileFragment> {
 
   Future<void> getPageListApi() async {
     appStore.setLoading(true);
-    await getPagesList().then((value) {
-      appStore.setLoading(false);
-      if (value.data.validate().isNotEmpty) {
-        pageList.addAll(value.data!);
-      }
-      setState(() {});
-    }).catchError((e) {
-      appStore.setLoading(false);
-      toast(e.toString(), print: true);
-    });
+    await getPagesList()
+        .then((value) {
+          appStore.setLoading(false);
+          if (value.data.validate().isNotEmpty) {
+            pageList.addAll(value.data!);
+          }
+          setState(() {});
+        })
+        .catchError((e) {
+          appStore.setLoading(false);
+          toast(e.toString(), print: true);
+        });
   }
 
   @override
@@ -102,25 +104,50 @@ class DProfileFragmentState extends State<DProfileFragment> {
     if (mounted) super.setState(fn);
   }
 
-  Widget accountSettingItemWidget(String? img, String title, Function() onTap, {bool isLast = false, IconData? suffixIcon}) {
+  Widget accountSettingItemWidget(
+    String? img,
+    String title,
+    Function() onTap, {
+    bool isLast = false,
+    IconData? suffixIcon,
+  }) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         ListTile(
-            contentPadding: .symmetric(horizontal: 16, vertical: 2),
-            minLeadingWidth: 14,
-            dense: true,
-            leading: Image.asset(img.validate(), height: 18, fit: BoxFit.fill, width: 18, color: textPrimaryColorGlobal),
-            title: Text(title, style: primaryTextStyle()),
-            trailing: suffixIcon != null ? Icon(suffixIcon, color: Colors.green) : Icon(Icons.navigate_next, color: appStore.isDarkMode ? Colors.white : Colors.grey),
-            onTap: onTap),
-        if (isLast) Divider(height: 0, color: ColorUtils.dividerColor)
+          contentPadding: .symmetric(horizontal: 16, vertical: 2),
+          minLeadingWidth: 14,
+          dense: true,
+          leading: Image.asset(
+            img.validate(),
+            height: 18,
+            fit: BoxFit.fill,
+            width: 18,
+            color: textPrimaryColorGlobal,
+          ),
+          title: Text(title, style: primaryTextStyle()),
+          trailing: suffixIcon != null
+              ? Icon(suffixIcon, color: Colors.green)
+              : Icon(
+                  Icons.navigate_next,
+                  color: appStore.isDarkMode ? Colors.white : Colors.grey,
+                ),
+          onTap: onTap,
+        ),
+        if (isLast) Divider(height: 0, color: ColorUtils.dividerColor),
       ],
     );
   }
 
   Widget mTitle(String value) {
-    return Text(value.toUpperCase(), style: boldTextStyle(size: 12, letterSpacing: 0.7, color: textSecondaryColorGlobal)).paddingOnly(left: 16, right: 16, top: 24, bottom: 4);
+    return Text(
+      value.toUpperCase(),
+      style: boldTextStyle(
+        size: 12,
+        letterSpacing: 0.7,
+        color: textSecondaryColorGlobal,
+      ),
+    ).paddingOnly(left: 16, right: 16, top: 24, bottom: 4);
   }
 
   @override
@@ -135,33 +162,67 @@ class DProfileFragmentState extends State<DProfileFragment> {
                 Column(
                   children: [
                     Row(
-                      children: [
-                        Stack(
-                          alignment: Alignment.bottomRight,
                           children: [
-                            Container(
-                                decoration: boxDecorationWithRoundedCorners(boxShape: BoxShape.circle, border: Border.all(width: 2, color: ColorUtils.colorPrimary)),
-                                child: commonCachedNetworkImage(appStore.userProfile.validate(), height: 65, width: 65, fit: BoxFit.cover, alignment: Alignment.center).cornerRadiusWithClipRRect(50)),
-                            Container(decoration: boxDecorationWithRoundedCorners(boxShape: BoxShape.circle, border: Border.all(width: 1, color: white), backgroundColor: ColorUtils.colorPrimary), padding: .all(4), child: Image.asset(ic_edit, color: white, height: 14, width: 14))
+                            Stack(
+                              alignment: Alignment.bottomRight,
+                              children: [
+                                Container(
+                                  decoration: boxDecorationWithRoundedCorners(
+                                    boxShape: BoxShape.circle,
+                                    border: Border.all(
+                                      width: 2,
+                                      color: ColorUtils.colorPrimary,
+                                    ),
+                                  ),
+                                  child: commonCachedNetworkImage(
+                                    appStore.userProfile.validate(),
+                                    height: 65,
+                                    width: 65,
+                                    fit: BoxFit.cover,
+                                    alignment: Alignment.center,
+                                  ).cornerRadiusWithClipRRect(50),
+                                ),
+                                Container(
+                                  decoration: boxDecorationWithRoundedCorners(
+                                    boxShape: BoxShape.circle,
+                                    border: Border.all(width: 1, color: white),
+                                    backgroundColor: ColorUtils.colorPrimary,
+                                  ),
+                                  padding: .all(4),
+                                  child: Image.asset(
+                                    ic_edit,
+                                    color: white,
+                                    height: 14,
+                                    width: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            10.width,
+                            Column(
+                              crossAxisAlignment: .start,
+                              children: [
+                                Text(
+                                  getStringAsync(NAME).validate(),
+                                  style: boldTextStyle(size: 20),
+                                ),
+                                6.height,
+                                Text(
+                                  appStore.userEmail.validate(),
+                                  style: secondaryTextStyle(size: 16),
+                                ),
+                              ],
+                            ).expand(),
+                            Text(
+                              "${appStore.avgRating} ⭐",
+                              style: boldTextStyle(size: 24),
+                            ).paddingRight(16),
                           ],
-                        ),
-                        10.width,
-                        Column(
-                          crossAxisAlignment: .start,
-                          children: [
-                            Text(getStringAsync(NAME).validate(), style: boldTextStyle(size: 20)),
-                            6.height,
-                            Text(appStore.userEmail.validate(), style: secondaryTextStyle(size: 16)),
-                          ],
-                        ).expand(),
-                        Text(
-                          "${appStore.avgRating} ⭐",
-                          style: boldTextStyle(size: 24),
-                        ).paddingRight(16)
-                      ],
-                    ).onTap(() {
-                      EditProfileScreen().launch(context);
-                    }).paddingOnly(top: 12, right: 12, left: 12),
+                        )
+                        .onTap(() {
+                          EditProfileScreen().launch(context);
+                        })
+                        .paddingOnly(top: 12, right: 12, left: 12),
                     ListView(
                       padding: .zero,
                       shrinkWrap: true,
@@ -169,7 +230,15 @@ class DProfileFragmentState extends State<DProfileFragment> {
                       children: [
                         mTitle(language.ordersWalletMore),
                         Container(
-                          decoration: boxDecorationWithRoundedCorners(borderRadius: BorderRadius.circular(defaultRadius), border: Border.all(color: ColorUtils.colorPrimary.withValues(alpha:0.3)), backgroundColor: Colors.transparent),
+                          decoration: boxDecorationWithRoundedCorners(
+                            borderRadius: BorderRadius.circular(defaultRadius),
+                            border: Border.all(
+                              color: ColorUtils.colorPrimary.withValues(
+                                alpha: 0.3,
+                              ),
+                            ),
+                            backgroundColor: Colors.transparent,
+                          ),
                           padding: .symmetric(horizontal: 16, vertical: 4),
                           margin: .symmetric(horizontal: 15, vertical: 4),
                           child: Row(
@@ -178,96 +247,206 @@ class DProfileFragmentState extends State<DProfileFragment> {
                                 crossAxisAlignment: .start,
                                 children: [
                                   Text(
-                                    vehicle != null ? language.yourVehicle : language.noVehicleAdded,
+                                    vehicle != null
+                                        ? language.yourVehicle
+                                        : language.noVehicleAdded,
                                     style: primaryTextStyle(),
                                   ),
                                   Text(
-                                    vehicle != null ? "${vehicle!.vehicleInfo.make.validate()}" : "-",
+                                    vehicle != null
+                                        ? "${vehicle!.vehicleInfo.make.validate()}"
+                                        : "-",
                                     style: boldTextStyle(),
                                   ),
                                 ],
                               ),
                               Spacer(),
                               Container(
-                                decoration: boxDecorationWithRoundedCorners(borderRadius: BorderRadius.circular(defaultRadius), backgroundColor: ColorUtils.colorPrimary),
-                                padding: .symmetric(horizontal: 15, vertical: 5),
+                                decoration: boxDecorationWithRoundedCorners(
+                                  borderRadius: BorderRadius.circular(
+                                    defaultRadius,
+                                  ),
+                                  backgroundColor: ColorUtils.colorPrimary,
+                                ),
+                                padding: .symmetric(
+                                  horizontal: 15,
+                                  vertical: 5,
+                                ),
                                 child: Text(
-                                  vehicle != null ? language.update : language.add,
+                                  vehicle != null
+                                      ? language.update
+                                      : language.add,
                                   style: TextStyle(color: Colors.white),
                                 ),
                               ).onTap(() {
                                 AddDeliverymanVehicleScreen(
-                                  vehicle: vehicle != null ? vehicle!.vehicleInfo : null,
+                                  vehicle: vehicle != null
+                                      ? vehicle!.vehicleInfo
+                                      : null,
                                   isUpdate: true,
                                 ).launch(context);
-                              })
+                              }),
                             ],
                           ),
                         ),
-                        accountSettingItemWidget(ic_earning, language.earningHistory, () {
-                          EarningHistoryScreen().launch(context);
-                        }),
-                        accountSettingItemWidget(ic_change_password, language.earnedRewards, () {
-                          RewardListScreen().launch(context);
-                        }),
-                        accountSettingItemWidget(ic_earn, language.referAndEarn, () {
-                          ReferEarnScreen().launch(context);
-                        }),
-                        accountSettingItemWidget(ic_refer_history, language.referralHistory, () {
-                          ReferralHistoryScreen().launch(context);
-                        }),
-                        accountSettingItemWidget(ic_wallet, language.wallet, () {
-                          WalletScreen().launch(context);
-                        }),
-                        accountSettingItemWidget(ic_wallet, "Payout Screen", () {
-                          DriverPayoutListScreen().launch(context);
-                        }),
-                        accountSettingItemWidget(ic_vehicle_list, language.vehicleHistory, () {
-                          SelectVehicleScreen().launch(context);
-                        }),
-                        accountSettingItemWidget(ic_bank_detail, language.bankDetails, () {
-                          BankDetailScreen().launch(context);
-                        }, isLast: true),
+                        accountSettingItemWidget(
+                          ic_earning,
+                          language.earningHistory,
+                          () {
+                            EarningHistoryScreen().launch(context);
+                          },
+                        ),
+                        // accountSettingItemWidget(
+                        //   ic_change_password,
+                        //   language.earnedRewards,
+                        //   () {
+                        //     RewardListScreen().launch(context);
+                        //   },
+                        // ),
+                        // accountSettingItemWidget(
+                        //   ic_earn,
+                        //   language.referAndEarn,
+                        //   () {
+                        //     ReferEarnScreen().launch(context);
+                        //   },
+                        // ),
+                        // accountSettingItemWidget(
+                        //   ic_refer_history,
+                        //   language.referralHistory,
+                        //   () {
+                        //     ReferralHistoryScreen().launch(context);
+                        //   },
+                        // ),
+                        accountSettingItemWidget(
+                          ic_wallet,
+                          language.wallet,
+                          () {
+                            WalletScreen().launch(context);
+                          },
+                        ),
+                        accountSettingItemWidget(
+                          ic_wallet,
+                          "Payout Screen",
+                          () {
+                            DriverPayoutListScreen().launch(context);
+                          },
+                        ),
+                        accountSettingItemWidget(
+                          ic_vehicle_list,
+                          language.vehicleHistory,
+                          () {
+                            SelectVehicleScreen().launch(context);
+                          },
+                          isLast: true,
+                        ),
+                        // accountSettingItemWidget(
+                        //   ic_bank_detail,
+                        //   language.bankDetails,
+                        //   () {
+                        //     BankDetailScreen().launch(context);
+                        //   },
+                        //   isLast: true,
+                        // ),
                         mTitle(language.account),
-                        accountSettingItemWidget(ic_verification, language.verifyDocument, () {
-                          VerifyDeliveryPersonScreen().launch(context);
-                        }, suffixIcon: getBoolAsync(IS_VERIFIED_DELIVERY_MAN) ? Icons.verified_user : null),
-                        accountSettingItemWidget(ic_change_password, language.changePassword, () {
-                          ChangePasswordScreen().launch(context);
-                        }),
-                        accountSettingItemWidget(ic_languages, language.language, () {
-                          LanguageScreen().launch(context);
-                        }),
-                        accountSettingItemWidget(ic_dark_mode, language.theme, () async {
-                          await showInDialog(context, shape: RoundedRectangleBorder(borderRadius: radius()), builder: (_) => ThemeSelectionDialog(), contentPadding: .zero);
-                        }),
-                        accountSettingItemWidget(ic_change_password, language.customerSupport, () {
-                          CustomerSupportScreen().launch(context);
-                        }),
-                        accountSettingItemWidget(ic_delete_account, language.deleteAccount, () async {
-                          DeleteAccountScreen().launch(context);
-                        }, isLast: true),
+                        accountSettingItemWidget(
+                          ic_verification,
+                          language.verifyDocument,
+                          () {
+                            VerifyDeliveryPersonScreen().launch(context);
+                          },
+                          suffixIcon: getBoolAsync(IS_VERIFIED_DELIVERY_MAN)
+                              ? Icons.verified_user
+                              : null,
+                        ),
+                        accountSettingItemWidget(
+                          ic_change_password,
+                          language.changePassword,
+                          () {
+                            ChangePasswordScreen().launch(context);
+                          },
+                        ),
+                        accountSettingItemWidget(
+                          ic_languages,
+                          language.language,
+                          () {
+                            LanguageScreen().launch(context);
+                          },
+                        ),
+                        accountSettingItemWidget(
+                          ic_dark_mode,
+                          language.theme,
+                          () async {
+                            await showInDialog(
+                              context,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: radius(),
+                              ),
+                              builder: (_) => ThemeSelectionDialog(),
+                              contentPadding: .zero,
+                            );
+                          },
+                        ),
+                        accountSettingItemWidget(
+                          ic_change_password,
+                          language.customerSupport,
+                          () {
+                            CustomerSupportScreen().launch(context);
+                          },
+                        ),
+                        accountSettingItemWidget(
+                          ic_delete_account,
+                          language.deleteAccount,
+                          () async {
+                            DeleteAccountScreen().launch(context);
+                          },
+                          isLast: true,
+                        ),
                         mTitle(language.general),
-                        accountSettingItemWidget(ic_document, language.privacyPolicy, () {
-                          commonLaunchUrl(mPrivacyPolicy);
-                        }),
-                        accountSettingItemWidget(ic_information, language.helpAndSupport, () {
-                          //    commonLaunchUrl(appStore.siteEmail);
-                          print("--------------${appStore.siteEmail}");
-                          commonLaunchUrl('mailto:${appStore.siteEmail}');
-                        }),
-                        accountSettingItemWidget(ic_document, language.termAndCondition, () {
-                          commonLaunchUrl(mTermAndCondition);
-                        }),
-                        accountSettingItemWidget(ic_document, language.addSOSContacts, () {
-                          Addsoscontactsscreen().launch(context);
-                        }),
-                        accountSettingItemWidget(ic_document, language.emergencyAlert, () {
-                          EmergencyAlertScreen().launch(context);
-                        }),
-                        accountSettingItemWidget(ic_information, language.aboutUs, () {
-                          AboutUsScreen().launch(context);
-                        }, isLast: pageList.isNotEmpty),
+                        accountSettingItemWidget(
+                          ic_document,
+                          language.privacyPolicy,
+                          () {
+                            commonLaunchUrl(mPrivacyPolicy);
+                          },
+                        ),
+                        accountSettingItemWidget(
+                          ic_information,
+                          language.helpAndSupport,
+                          () {
+                            //    commonLaunchUrl(appStore.siteEmail);
+                            print("--------------${appStore.siteEmail}");
+                            commonLaunchUrl('mailto:${appStore.siteEmail}');
+                          },
+                        ),
+                        accountSettingItemWidget(
+                          ic_document,
+                          language.termAndCondition,
+                          () {
+                            commonLaunchUrl(mTermAndCondition);
+                          },
+                        ),
+                        accountSettingItemWidget(
+                          ic_document,
+                          language.addSOSContacts,
+                          () {
+                            Addsoscontactsscreen().launch(context);
+                          },
+                        ),
+                        accountSettingItemWidget(
+                          ic_document,
+                          language.emergencyAlert,
+                          () {
+                            EmergencyAlertScreen().launch(context);
+                          },
+                        ),
+                        accountSettingItemWidget(
+                          ic_information,
+                          language.aboutUs,
+                          () {
+                            AboutUsScreen().launch(context);
+                          },
+                          isLast: pageList.isNotEmpty,
+                        ),
                         if (pageList.isNotEmpty) ...[
                           mTitle(language.pages),
                           ListView.builder(
@@ -275,38 +454,60 @@ class DProfileFragmentState extends State<DProfileFragment> {
                             shrinkWrap: true,
                             itemBuilder: (context, index) {
                               PageData item = pageList[index];
-                              return accountSettingItemWidget(ic_pages, item.title.validate(), () {
-                                PageDetailScreen(
-                                  title: item.title.validate(),
-                                  description: item.description.validate(),
-                                ).launch(context);
-                              });
+                              return accountSettingItemWidget(
+                                ic_pages,
+                                item.title.validate(),
+                                () {
+                                  PageDetailScreen(
+                                    title: item.title.validate(),
+                                    description: item.description.validate(),
+                                  ).launch(context);
+                                },
+                              );
                             },
                             itemCount: pageList.length,
-                          )
+                          ),
                         ],
                         Container(
-                          decoration: boxDecorationWithRoundedCorners(border: Border.all(color: ColorUtils.colorPrimary, width: 1), backgroundColor: Colors.transparent),
-                          padding: .all(16),
-                          width: context.width(),
-                          child: Text(language.logout, style: boldTextStyle(size: 18, color: ColorUtils.colorPrimary), textAlign: TextAlign.center),
-                        ).onTap(() async {
-                          await showConfirmDialogCustom(
-                            context,
-                            primaryColor: ColorUtils.colorPrimary,
-                            title: language.logoutConfirmationMsg,
-                            positiveText: language.yes,
-                            negativeText: language.no,
-                            onAccept: (c) {
-                              logout(context);
-                            },
-                          );
-                        }).paddingAll(16),
+                              decoration: boxDecorationWithRoundedCorners(
+                                border: Border.all(
+                                  color: ColorUtils.colorPrimary,
+                                  width: 1,
+                                ),
+                                backgroundColor: Colors.transparent,
+                              ),
+                              padding: .all(16),
+                              width: context.width(),
+                              child: Text(
+                                language.logout,
+                                style: boldTextStyle(
+                                  size: 18,
+                                  color: ColorUtils.colorPrimary,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            )
+                            .onTap(() async {
+                              await showConfirmDialogCustom(
+                                context,
+                                primaryColor: ColorUtils.colorPrimary,
+                                title: language.logoutConfirmationMsg,
+                                positiveText: language.yes,
+                                negativeText: language.no,
+                                onAccept: (c) {
+                                  logout(context);
+                                },
+                              );
+                            })
+                            .paddingAll(16),
                         FutureBuilder<PackageInfo>(
                           future: PackageInfo.fromPlatform(),
                           builder: (_, snap) {
                             if (snap.hasData) {
-                              return Text('${language.version} ${snap.data!.version.validate()}', style: secondaryTextStyle()).center();
+                              return Text(
+                                '${language.version} ${snap.data!.version.validate()}',
+                                style: secondaryTextStyle(),
+                              ).center();
                             }
                             return SizedBox();
                           },
@@ -318,9 +519,7 @@ class DProfileFragmentState extends State<DProfileFragment> {
                 ),
               ],
             ),
-            Positioned.fill(
-              child: loaderWidget().visible(appStore.isLoading),
-            ),
+            Positioned.fill(child: loaderWidget().visible(appStore.isLoading)),
           ],
         ),
       ),

@@ -61,7 +61,7 @@
         "screenId": "2",
         "keyword_id": 9,
         "keyword_name": "appName",
-        "keyword_value": "Veloxi Delivery"
+        "keyword_value": "Véloxi"
       }
     ]
   },
@@ -518,7 +518,7 @@
         "keyword_id": 53,
         "keyword_name": "passwordNotMatch",
         "keyword_value": "Password does not match"
-      },
+      }, 
       {
         "screenId": "9",
         "keyword_id": 54,

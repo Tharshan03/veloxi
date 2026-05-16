@@ -64,8 +64,7 @@ class LoginScreenState extends State<LoginScreen> {
 
   Future<void> init() async {
     if (getStringAsync(PLAYER_ID).isEmpty) {
-      await saveOneSignalPlayerId().then((value) {
-      });
+      await saveOneSignalPlayerId().then((value) {});
     }
     mIsCheck = getBoolAsync(REMEMBER_ME, defaultValue: false);
     if (mIsCheck) {
@@ -75,7 +74,6 @@ class LoginScreenState extends State<LoginScreen> {
     checkAndShowFirebasePopup();
   }
 
-
   Future<void> checkAndShowFirebasePopup() async {
     try {
       final docRef = firestore.FirebaseFirestore.instance
@@ -84,11 +82,7 @@ class LoginScreenState extends State<LoginScreen> {
       final doc = await docRef.get();
       if (!doc.exists) {
         // Create default document
-        await docRef.set({
-          "show_popup": false,
-          "message": "",
-          "title": "",
-        });
+        await docRef.set({"show_popup": false, "message": "", "title": ""});
         return;
       }
       bool showPopup = doc.data()?['show_popup'] ?? false;
@@ -101,7 +95,7 @@ class LoginScreenState extends State<LoginScreen> {
             context: context,
             barrierDismissible: false,
             builder: (context) {
-              return popupDialog(title,message);
+              return popupDialog(title, message);
             },
           );
         });
@@ -116,7 +110,6 @@ class LoginScreenState extends State<LoginScreen> {
     if (mounted) super.setState(fn);
   }
 
-
   Future<void> loginApiCall() async {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
@@ -124,14 +117,14 @@ class LoginScreenState extends State<LoginScreen> {
       if (isAcceptedTc) {
         appStore.setLoading(true);
         String email = Encryption.instance.encrypt(emailController.text.trim());
-        String password = Encryption.instance.encrypt(passController.text.trim());
-        String playerId = Encryption.instance.encrypt(getStringAsync(PLAYER_ID).validate());
+        String password = Encryption.instance.encrypt(
+          passController.text.trim(),
+        );
+        String playerId = Encryption.instance.encrypt(
+          getStringAsync(PLAYER_ID).validate(),
+        );
 
-        Map req = {
-          "email": email,
-          "password": password,
-          "player_id": playerId,
-        };
+        Map req = {"email": email, "password": password, "player_id": playerId};
 
         if (mIsCheck) {
           await setValue(REMEMBER_ME, mIsCheck);
@@ -139,71 +132,104 @@ class LoginScreenState extends State<LoginScreen> {
           await setValue(USER_PASSWORD, passController.text);
         }
         print("Register Req => ${req.toString()}");
-        await logInApi(req).then((v) async {
-          authService.signInWithEmailPassword(context, email: emailController.text, password: passController.text).then((value) async {
-            appStore.setLoading(false);
-            if (v.data!.userType == DELIVERY_MAN) {
-              isSosVisible.value = true;
-              print("KB----------------isSos-------${isSosVisible.value}");
-            } else {
-              isSosVisible.value = false;
-            }
-            if (v.data!.userType != CLIENT && v.data!.userType != DELIVERY_MAN) {
-              showConfirmDialogCustom(
-                context,
-                title: language.logoutConfirmationMsg,
-                positiveText: language.yes,
-                primaryColor: ColorUtils.colorPrimary,
-                showCancelButton: false,
-                onAccept: (v) async {
-                  await logout(context, isFromLogin: true);
-                },
-              );
-            } else {
-              appStore.setUserType(v.data!.userType.toString());
-              if (getIntAsync(STATUS) == 1) {
-                updateUserStatus({
-                  "id": getIntAsync(USER_ID),
-                  "uid": getStringAsync(UID),
-                }).then((value) {
-                  log("value...." + value.toString());
-                });
-                log('v.data!.emailVerifiedAt ${v.data!.emailVerifiedAt}');
-                log('v.data!.otp ${v.data!.otpVerifyAt}');
-                if (v.data!.emailVerifiedAt.isEmptyOrNull || v.data!.otpVerifyAt.isEmptyOrNull || (v.data!.documentVerifiedAt.isEmptyOrNull && getStringAsync(USER_TYPE) == DELIVERY_MAN)) {
-                  VerificationListScreen(
-                    isSignIn: true,
-                  ).launch(context);
-                } else if (v.data!.countryId != null && v.data!.cityId != null) {
-                  await getCountryDetailApiCall(v.data!.countryId.validate());
-                  getCityDetailApiCall(v.data!.cityId.validate());
-                } else {
-                  UserCitySelectScreen().launch(context, isNewTask: true);
-                }
-              } else {
-                toast(language.userNotApproveMsg);
-                await logout(context, isDeleteAccount: true);
-              }
-            }
-            updateStoreCheckerData().then((source) async {
-              await getUserDetail(getIntAsync(USER_ID)).then((value) async {
-                appStore.setAvrgRating(value.averageRating ?? 0);
-                if (value.deliverymanVehicleHistory != null) {
-                  setValue(VEHICLE, value.deliverymanVehicleHistory![0].toJson());
-                }
-                appStore.setReferralCode(value.referralCode.validate());
-                if (value.app_source.isEmptyOrNull || value.app_source != source) {
-                  await updateUserStatus({"id": getIntAsync(USER_ID), "app_source": source}).then((data) {});
-                }
-              }).catchError((e) {
-                log("error---------$e");
-              });
+        await logInApi(req)
+            .then((v) async {
+              authService
+                  .signInWithEmailPassword(
+                    context,
+                    email: emailController.text,
+                    password: passController.text,
+                  )
+                  .then((value) async {
+                    appStore.setLoading(false);
+                    if (v.data!.userType == DELIVERY_MAN) {
+                      isSosVisible.value = true;
+                      print(
+                        "KB----------------isSos-------${isSosVisible.value}",
+                      );
+                    } else {
+                      isSosVisible.value = false;
+                    }
+                    if (v.data!.userType != CLIENT &&
+                        v.data!.userType != DELIVERY_MAN) {
+                      showConfirmDialogCustom(
+                        context,
+                        title: language.logoutConfirmationMsg,
+                        positiveText: language.yes,
+                        primaryColor: ColorUtils.colorPrimary,
+                        showCancelButton: false,
+                        onAccept: (v) async {
+                          await logout(context, isFromLogin: true);
+                        },
+                      );
+                    } else {
+                      appStore.setUserType(v.data!.userType.toString());
+                      if (getIntAsync(STATUS) == 1) {
+                        updateUserStatus({
+                          "id": getIntAsync(USER_ID),
+                          "uid": getStringAsync(UID),
+                        }).then((value) {
+                          log("value...." + value.toString());
+                        });
+                        log(
+                          'v.data!.emailVerifiedAt ${v.data!.emailVerifiedAt}',
+                        );
+                        log('v.data!.otp ${v.data!.otpVerifyAt}');
+                        if (v.data!.emailVerifiedAt.isEmptyOrNull ||
+                            v.data!.otpVerifyAt.isEmptyOrNull ||
+                            (v.data!.documentVerifiedAt.isEmptyOrNull &&
+                                getStringAsync(USER_TYPE) == DELIVERY_MAN)) {
+                          VerificationListScreen(
+                            isSignIn: true,
+                          ).launch(context);
+                        } else if (v.data!.countryId != null &&
+                            v.data!.cityId != null) {
+                          await getCountryDetailApiCall(
+                            v.data!.countryId.validate(),
+                          );
+                          getCityDetailApiCall(v.data!.cityId.validate());
+                        } else {
+                          UserCitySelectScreen().launch(
+                            context,
+                            isNewTask: true,
+                          );
+                        }
+                      } else {
+                        toast(language.userNotApproveMsg);
+                        await logout(context, isDeleteAccount: true);
+                      }
+                    }
+                    updateStoreCheckerData().then((source) async {
+                      await getUserDetail(getIntAsync(USER_ID))
+                          .then((value) async {
+                            appStore.setAvrgRating(value.averageRating ?? 0);
+                            if (value.deliverymanVehicleHistory != null) {
+                              setValue(
+                                VEHICLE,
+                                value.deliverymanVehicleHistory![0].toJson(),
+                              );
+                            }
+                            appStore.setReferralCode(
+                              value.referralCode.validate(),
+                            );
+                            if (value.app_source.isEmptyOrNull ||
+                                value.app_source != source) {
+                              await updateUserStatus({
+                                "id": getIntAsync(USER_ID),
+                                "app_source": source,
+                              }).then((data) {});
+                            }
+                          })
+                          .catchError((e) {
+                            log("error---------$e");
+                          });
+                    });
+                  });
+            })
+            .catchError((e) {
+              appStore.setLoading(false);
+              toast(e.toString());
             });
-          });
-        }).catchError((e) {
-          appStore.setLoading(false);
-          toast(e.toString());
-        });
       } else {
         toast(language.acceptTermService);
       }
@@ -254,66 +280,87 @@ class LoginScreenState extends State<LoginScreen> {
   }
 
   getCountryDetailApiCall(int countryId) async {
-    await getCountryDetail(countryId).then((value) {
-      setValue(COUNTRY_DATA, value.data!.toJson());
-    }).catchError((error) {});
+    await getCountryDetail(countryId)
+        .then((value) {
+          setValue(COUNTRY_DATA, value.data!.toJson());
+        })
+        .catchError((error) {});
   }
 
   getCityDetailApiCall(int cityId) async {
-    await getCityDetail(cityId).then((value) async {
-      await setValue(CITY_DATA, value.data!.toJson());
-      if (CityModel.fromJson(getJSONAsync(CITY_DATA)).name.validate().isNotEmpty) {
-        if (getBoolAsync(OTP_VERIFIED) && getBoolAsync(EMAIL_VERIFIED) && (getBoolAsync(IS_VERIFIED_DELIVERY_MAN) || getStringAsync(USER_TYPE) == CLIENT)) {
-          if (getStringAsync(USER_TYPE) == CLIENT) {
-            DashboardScreen().launch(context, isNewTask: true);
+    await getCityDetail(cityId)
+        .then((value) async {
+          await setValue(CITY_DATA, value.data!.toJson());
+          if (CityModel.fromJson(
+            getJSONAsync(CITY_DATA),
+          ).name.validate().isNotEmpty) {
+            if (getBoolAsync(OTP_VERIFIED) &&
+                getBoolAsync(EMAIL_VERIFIED) &&
+                (getBoolAsync(IS_VERIFIED_DELIVERY_MAN) ||
+                    getStringAsync(USER_TYPE) == CLIENT)) {
+              if (getStringAsync(USER_TYPE) == CLIENT) {
+                DashboardScreen().launch(context, isNewTask: true);
+              } else {
+                // DeliveryDashBoard().launch(context, isNewTask: true);
+                DHomeFragment().launch(context, isNewTask: true);
+              }
+            } else {
+              VerificationListScreen().launch(context, isNewTask: true);
+              // VerificationScreen().launch(context, isNewTask: true);
+            }
           } else {
-            // DeliveryDashBoard().launch(context, isNewTask: true);
-            DHomeFragment().launch(context, isNewTask: true);
+            UserCitySelectScreen().launch(context, isNewTask: true);
           }
-        } else {
-          VerificationListScreen().launch(context, isNewTask: true);
-          // VerificationScreen().launch(context, isNewTask: true);
-        }
-      } else {
-        UserCitySelectScreen().launch(context, isNewTask: true);
-      }
-    }).catchError((error) {
-      if (error.toString() == CITY_NOT_FOUND_EXCEPTION) {
-        UserCitySelectScreen().launch(getContext, isNewTask: true, pageRouteAnimation: PageRouteAnimation.Slide);
-      }
-    });
+        })
+        .catchError((error) {
+          if (error.toString() == CITY_NOT_FOUND_EXCEPTION) {
+            UserCitySelectScreen().launch(
+              getContext,
+              isNewTask: true,
+              pageRouteAnimation: PageRouteAnimation.Slide,
+            );
+          }
+        });
   }
 
   void googleSignIn() async {
     hideKeyboard(context);
     appStore.setLoading(true);
 
-    await authService.signInWithGoogle(userType: userType).then((value) async {
-      appStore.setLoading(false);
-      await setValue(USER_PASSWORD, passController.text);
-      await setValue(LOGIN_TYPE, LoginTypeGoogle);
-    }).catchError((e) {
-      appStore.setLoading(false);
-      toast(e.toString());
-      print(e.toString());
-    });
+    await authService
+        .signInWithGoogle(userType: userType)
+        .then((value) async {
+          appStore.setLoading(false);
+          await setValue(USER_PASSWORD, passController.text);
+          await setValue(LOGIN_TYPE, LoginTypeGoogle);
+        })
+        .catchError((e) {
+          appStore.setLoading(false);
+          toast(e.toString());
+          print(e.toString());
+        });
   }
 
   appleLoginApi() async {
     hideKeyboard(context);
     appStore.setLoading(true);
-    await authService.appleLogIn(userType).then((value) {
-      appStore.setLoading(false);
-    }).catchError((e) {
-      appStore.setLoading(false);
-      toast(e.toString());
-    });
+    await authService
+        .appleLogIn(userType)
+        .then((value) {
+          appStore.setLoading(false);
+        })
+        .catchError((e) {
+          appStore.setLoading(false);
+          toast(e.toString());
+        });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: appStore.isDarkMode ? ColorUtils.scaffoldSecondaryDark : ColorUtils.colorPrimaryLight,
+      backgroundColor: appStore.isDarkMode
+          ? ColorUtils.scaffoldSecondaryDark
+          : ColorUtils.colorPrimaryLight,
       appBar: commonAppBarWidget(language.signIn, showBack: false),
       body: Stack(
         children: [
@@ -358,9 +405,12 @@ class LoginScreenState extends State<LoginScreen> {
                             height: 20,
                             width: 20,
                             child: Checkbox(
-                              shape: RoundedRectangleBorder(borderRadius: radius(4)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: radius(4),
+                              ),
                               checkColor: Colors.white,
-                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
                               focusColor: ColorUtils.colorPrimary,
                               activeColor: ColorUtils.colorPrimary,
                               value: mIsCheck,
@@ -374,14 +424,20 @@ class LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           10.width,
-                          Text(language.rememberMe, style: primaryTextStyle())
+                          Text(language.rememberMe, style: primaryTextStyle()),
                         ],
                       ),
                       Align(
                         alignment: Alignment.topRight,
-                        child: Text(language.forgotPasswordQue, style: boldTextStyle(color: ColorUtils.colorPrimary)).onTap(() {
-                          ForgotPasswordScreen().launch(context);
-                        }),
+                        child:
+                            Text(
+                              language.forgotPasswordQue,
+                              style: boldTextStyle(
+                                color: ColorUtils.colorPrimary,
+                              ),
+                            ).onTap(() {
+                              ForgotPasswordScreen().launch(context);
+                            }),
                       ),
                     ],
                   ),
@@ -392,9 +448,12 @@ class LoginScreenState extends State<LoginScreen> {
                         height: 20,
                         width: 20,
                         child: Checkbox(
-                          shape: RoundedRectangleBorder(borderRadius: radius(4)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: radius(4),
+                          ),
                           checkColor: Colors.white,
-                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
                           focusColor: ColorUtils.colorPrimary,
                           activeColor: ColorUtils.colorPrimary,
                           value: isAcceptedTc,
@@ -406,47 +465,62 @@ class LoginScreenState extends State<LoginScreen> {
                       ),
                       10.width,
                       RichText(
-                        text: TextSpan(children: [
-                          TextSpan(text: '${language.iAgreeToThe} ', style: secondaryTextStyle()),
-                          TextSpan(
-                            text: language.termOfService,
-                            style: boldTextStyle(color: ColorUtils.colorPrimary, size: 14),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                commonLaunchUrl(mTermAndCondition);
-                              },
-                          ),
-                          TextSpan(text: ' & ', style: secondaryTextStyle()),
-                          TextSpan(
-                            text: language.privacyPolicy,
-                            style: boldTextStyle(color: ColorUtils.colorPrimary, size: 14),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                commonLaunchUrl(mPrivacyPolicy);
-                              },
-                          ),
-                        ]),
-                      ).expand()
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '${language.iAgreeToThe} ',
+                              style: secondaryTextStyle(),
+                            ),
+                            TextSpan(
+                              text: language.termOfService,
+                              style: boldTextStyle(
+                                color: ColorUtils.colorPrimary,
+                                size: 14,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  commonLaunchUrl(mTermAndCondition);
+                                },
+                            ),
+                            TextSpan(text: ' & ', style: secondaryTextStyle()),
+                            TextSpan(
+                              text: language.privacyPolicy,
+                              style: boldTextStyle(
+                                color: ColorUtils.colorPrimary,
+                                size: 14,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  commonLaunchUrl(mPrivacyPolicy);
+                                },
+                            ),
+                          ],
+                        ),
+                      ).expand(),
                     ],
                   ),
                   30.height,
-                  commonButton(
-                    language.signIn,
-                    () {
-                      loginApiCall();
-                    },
-                    width: context.width(),
-                  ),
+                  commonButton(language.signIn, () {
+                    loginApiCall();
+                  }, width: context.width()),
                   32.height,
                   Row(
                     mainAxisAlignment: .center,
                     children: [
-                      Text(language.doNotHaveAccount, style: primaryTextStyle()),
+                      Text(
+                        language.doNotHaveAccount,
+                        style: primaryTextStyle(),
+                      ),
                       4.width,
-                      Text(language.signUp, style: boldTextStyle(color: ColorUtils.colorPrimary)).onTap(() {
-                        RegisterScreen(
-                          userType: CLIENT,
-                        ).launch(context, duration: Duration(milliseconds: 500), pageRouteAnimation: PageRouteAnimation.Slide);
+                      Text(
+                        language.signUp,
+                        style: boldTextStyle(color: ColorUtils.colorPrimary),
+                      ).onTap(() {
+                        RegisterScreen(userType: CLIENT).launch(
+                          context,
+                          duration: Duration(milliseconds: 500),
+                          pageRouteAnimation: PageRouteAnimation.Slide,
+                        );
                       }),
                     ],
                   ),
@@ -471,7 +545,9 @@ class LoginScreenState extends State<LoginScreen> {
                         child: Image.asset(ic_google, height: 30, width: 30),
                         style: OutlinedButton.styleFrom(
                           padding: .all(12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(defaultRadius)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(defaultRadius),
+                          ),
                           elevation: 0,
                         ),
                         onPressed: () {
@@ -486,7 +562,11 @@ class LoginScreenState extends State<LoginScreen> {
                           child: Image.asset(ic_apple, height: 30, width: 30),
                           style: OutlinedButton.styleFrom(
                             padding: .all(12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(defaultRadius)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                defaultRadius,
+                              ),
+                            ),
                             elevation: 0,
                           ),
                           onPressed: () {
@@ -501,20 +581,34 @@ class LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-          Observer(builder: (context) => loaderWidget().visible(appStore.isLoading)),
+          Observer(
+            builder: (context) => loaderWidget().visible(appStore.isLoading),
+          ),
         ],
       ),
       bottomNavigationBar: Container(
-        color: appStore.isDarkMode ? ColorUtils.scaffoldSecondaryDark : ColorUtils.colorPrimaryLight,
+        color: appStore.isDarkMode
+            ? ColorUtils.scaffoldSecondaryDark
+            : ColorUtils.colorPrimaryLight,
         padding: .all(16),
         child: appStore.isAllowDeliveryMan
             ? Row(
                 mainAxisAlignment: .center,
                 children: [
-                  Text("${language.becomeADeliveryBoy}", style: primaryTextStyle()),
+                  Text(
+                    "${language.becomeADeliveryBoy}",
+                    style: primaryTextStyle(),
+                  ),
                   4.width,
-                  Text(language.signUp, style: boldTextStyle(color: ColorUtils.colorPrimary)).onTap(() {
-                    RegisterScreen(userType: DELIVERY_MAN).launch(context, duration: Duration(milliseconds: 500), pageRouteAnimation: PageRouteAnimation.Slide);
+                  Text(
+                    language.signUp,
+                    style: boldTextStyle(color: ColorUtils.colorPrimary),
+                  ).onTap(() {
+                    RegisterScreen(userType: DELIVERY_MAN).launch(
+                      context,
+                      duration: Duration(milliseconds: 500),
+                      pageRouteAnimation: PageRouteAnimation.Slide,
+                    );
                   }),
                 ],
               ).visible(appStore.isAllowDeliveryMan)
@@ -533,38 +627,49 @@ class LoginScreenState extends State<LoginScreen> {
             return AlertDialog(
               actionsPadding: .all(16),
               contentPadding: .zero,
-              shape: RoundedRectangleBorder(borderRadius: radius(defaultRadius)),
-              title: Padding(padding: .only(bottom: 10), child: Text(language.selectUserType, style: boldTextStyle(size: 18))),
+              shape: RoundedRectangleBorder(
+                borderRadius: radius(defaultRadius),
+              ),
+              title: Padding(
+                padding: .only(bottom: 10),
+                child: Text(
+                  language.selectUserType,
+                  style: boldTextStyle(size: 18),
+                ),
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: userTypeList.where((item) {
-                  if (!appStore.isAllowDeliveryMan) {
-                    return item == CLIENT;
-                  }
-                  return item == CLIENT || item == DELIVERY_MAN;
-                }).map((item) {
-                  return RadioListTile<String>(
-                    value: item,
-                    activeColor: ColorUtils.colorPrimary,
-                    visualDensity: const VisualDensity(
-                      horizontal: VisualDensity.minimumDensity,
-                      vertical: VisualDensity.minimumDensity,
-                    ),
-                    contentPadding: .symmetric(horizontal: 16),
-                    title: Text(
-                      item == CLIENT
-                          ? language.lblUser
-                          : item == DELIVERY_MAN
+                children: userTypeList
+                    .where((item) {
+                      if (!appStore.isAllowDeliveryMan) {
+                        return item == CLIENT;
+                      }
+                      return item == CLIENT || item == DELIVERY_MAN;
+                    })
+                    .map((item) {
+                      return RadioListTile<String>(
+                        value: item,
+                        activeColor: ColorUtils.colorPrimary,
+                        visualDensity: const VisualDensity(
+                          horizontal: VisualDensity.minimumDensity,
+                          vertical: VisualDensity.minimumDensity,
+                        ),
+                        contentPadding: .symmetric(horizontal: 16),
+                        title: Text(
+                          item == CLIENT
+                              ? language.lblUser
+                              : item == DELIVERY_MAN
                               ? language.lblDeliveryBoy
                               : '',
-                    ),
-                    groupValue: userType,
-                    onChanged: (val) {
-                      userType = val.validate();
-                      setState(() {});
-                    },
-                  );
-                }).toList(),
+                        ),
+                        groupValue: userType,
+                        onChanged: (val) {
+                          userType = val.validate();
+                          setState(() {});
+                        },
+                      );
+                    })
+                    .toList(),
               ),
               actions: <Widget>[
                 Row(
@@ -576,8 +681,7 @@ class LoginScreenState extends State<LoginScreen> {
                     commonButton(language.lblContinue, () {
                       finish(context);
                       onContinue();
-                    }, color: ColorUtils.colorPrimary)
-                        .expand(),
+                    }, color: ColorUtils.colorPrimary).expand(),
                   ],
                 ),
               ],

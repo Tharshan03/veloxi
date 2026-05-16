@@ -33,7 +33,8 @@ const googleMapAPIKey = 'AIzaSyC4-FOPv87BzoCkpqeYdUKqfNulhFDXuPg';
 
 // region onesignal keys
 const mOneSignalAppId = '6fdc4c34-d716-4119-b87f-8a77bd2d5ed6';
-const mOneSignalRestKey = 'os_v2_app_n7oeyngxczartod7rj332lk62zi2if4cpoae6k5xsrexu4hdxcmozq663ollf7jtcjl6zbnn76oo4sxxsb2cpetsogxifoqsw6cln2q';
+const mOneSignalRestKey =
+    'os_v2_app_n7oeyngxczartod7rj332lk62zi2if4cpoae6k5xsrexu4hdxcmozq663ollf7jtcjl6zbnn76oo4sxxsb2cpetsogxifoqsw6cln2q';
 const mOneSignalChannelId = '';
 //endregion
 
@@ -293,12 +294,7 @@ const AUDIO = "AUDIO";
 
 List<String> rtlLanguage = ['ar', 'ur'];
 
-enum MessageType {
-  TEXT,
-  IMAGE,
-  VIDEO,
-  AUDIO,
-}
+enum MessageType { TEXT, IMAGE, VIDEO, AUDIO }
 
 extension MessageExtension on MessageType {
   String? get name {
