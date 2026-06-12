@@ -57,7 +57,6 @@ class DefaultFirebaseOptions {
     databaseURL: 'https://veloxi-7aaf6-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'veloxi-7aaf6.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyByCzhiPZZvVFYFA0ZkIqVSh6uLgCSE6SQ',
     appId: '1:449277276440:ios:ab70f978b649e6d9a02e6d',

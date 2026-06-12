@@ -64,7 +64,8 @@ const CURRENCY_SYMBOL = '€';
 const CURRENCY_CODE = 'FR';
 //endregion
 final mPrivacyPolicy = "$DOMAIN_URL/privacypolicy";
-final mTermAndCondition = "$DOMAIN_URL/termofservice";
+final mTermAndCondition = "$DOMAIN_URL/page/cgu-utilisateur";
+final mdTermAndCondition = "$DOMAIN_URL/page/cgu-livreurs";
 //endregion
 
 const mInvoiceCompanyName = 'Roberts Private Limited';

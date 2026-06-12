@@ -422,7 +422,7 @@ class DProfileFragmentState extends State<DProfileFragment> {
                           ic_document,
                           language.termAndCondition,
                           () {
-                            commonLaunchUrl(mTermAndCondition);
+                            commonLaunchUrl(mdTermAndCondition);
                           },
                         ),
                         accountSettingItemWidget(

@@ -35,7 +35,14 @@ import '../services/AuthServices.dart';
 import 'Images.dart';
 import 'Widgets.dart';
 
-InputDecoration commonInputDecoration({String? hintText, IconData? suffixIcon, Function()? suffixOnTap, Widget? dateTime, Widget? prefixIcon, bool? isFill = true}) {
+InputDecoration commonInputDecoration({
+  String? hintText,
+  IconData? suffixIcon,
+  Function()? suffixOnTap,
+  Widget? dateTime,
+  Widget? prefixIcon,
+  bool? isFill = true,
+}) {
   return InputDecoration(
     errorMaxLines: 3,
     contentPadding: .all(16),
@@ -44,17 +51,36 @@ InputDecoration commonInputDecoration({String? hintText, IconData? suffixIcon, F
     isDense: true,
     hintText: hintText != null ? hintText : '',
     hintStyle: secondaryTextStyle(size: 16, color: Colors.grey),
-    fillColor: ColorUtils.colorPrimary.withValues(alpha:0.06),
+    fillColor: ColorUtils.colorPrimary.withValues(alpha: 0.06),
     counterText: '',
     suffixIcon: dateTime != null
         ? dateTime
         : suffixIcon != null
-            ? Icon(suffixIcon, color: ColorUtils.colorPrimary, size: 22).onTap(suffixOnTap)
-            : null,
-    enabledBorder: OutlineInputBorder(borderSide: BorderSide(style: BorderStyle.solid, color: ColorUtils.colorPrimary.withValues(alpha:0.9)), borderRadius: BorderRadius.circular(defaultRadius)),
-    focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: ColorUtils.colorPrimary), borderRadius: BorderRadius.circular(defaultRadius)),
-    errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red), borderRadius: BorderRadius.circular(defaultRadius)),
-    focusedErrorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red), borderRadius: BorderRadius.circular(defaultRadius)),
+        ? Icon(
+            suffixIcon,
+            color: ColorUtils.colorPrimary,
+            size: 22,
+          ).onTap(suffixOnTap)
+        : null,
+    enabledBorder: OutlineInputBorder(
+      borderSide: BorderSide(
+        style: BorderStyle.solid,
+        color: ColorUtils.colorPrimary.withValues(alpha: 0.9),
+      ),
+      borderRadius: BorderRadius.circular(defaultRadius),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: ColorUtils.colorPrimary),
+      borderRadius: BorderRadius.circular(defaultRadius),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: Colors.red),
+      borderRadius: BorderRadius.circular(defaultRadius),
+    ),
+    focusedErrorBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: Colors.red),
+      borderRadius: BorderRadius.circular(defaultRadius),
+    ),
   );
 }
 
@@ -69,7 +95,13 @@ Widget commonCachedNetworkImage(
   double? radius,
 }) {
   if (url.validate().isEmpty) {
-    return placeHolderWidget(height: height, width: width, fit: fit, alignment: alignment, radius: radius);
+    return placeHolderWidget(
+      height: height,
+      width: width,
+      fit: fit,
+      alignment: alignment,
+      radius: radius,
+    );
   } else if (url.validate().startsWith('http')) {
     return CachedNetworkImage(
       imageUrl: url!,
@@ -79,20 +111,50 @@ Widget commonCachedNetworkImage(
       fit: fit,
       alignment: alignment as Alignment? ?? Alignment.center,
       errorWidget: (_, s, d) {
-        return placeHolderWidget(height: height, width: width, fit: fit, alignment: alignment, radius: radius);
+        return placeHolderWidget(
+          height: height,
+          width: width,
+          fit: fit,
+          alignment: alignment,
+          radius: radius,
+        );
       },
       placeholder: (_, s) {
         if (!usePlaceholderIfUrlEmpty) return SizedBox();
-        return placeHolderWidget(height: height, width: width, fit: fit, alignment: alignment, radius: radius);
+        return placeHolderWidget(
+          height: height,
+          width: width,
+          fit: fit,
+          alignment: alignment,
+          radius: radius,
+        );
       },
     );
   } else {
-    return Image.asset(url!, height: height, width: width, fit: fit, alignment: alignment ?? Alignment.center).cornerRadiusWithClipRRect(radius ?? defaultRadius);
+    return Image.asset(
+      url!,
+      height: height,
+      width: width,
+      fit: fit,
+      alignment: alignment ?? Alignment.center,
+    ).cornerRadiusWithClipRRect(radius ?? defaultRadius);
   }
 }
 
-Widget placeHolderWidget({double? height, double? width, BoxFit? fit, AlignmentGeometry? alignment, double? radius}) {
-  return Image.asset('assets/placeholder.jpg', height: height, width: width, fit: fit ?? BoxFit.cover, alignment: alignment ?? Alignment.center).cornerRadiusWithClipRRect(radius ?? defaultRadius);
+Widget placeHolderWidget({
+  double? height,
+  double? width,
+  BoxFit? fit,
+  AlignmentGeometry? alignment,
+  double? radius,
+}) {
+  return Image.asset(
+    'assets/placeholder.jpg',
+    height: height,
+    width: width,
+    fit: fit ?? BoxFit.cover,
+    alignment: alignment ?? Alignment.center,
+  ).cornerRadiusWithClipRRect(radius ?? defaultRadius);
 }
 
 Color statusColor(String status) {
@@ -156,11 +218,15 @@ String parcelTypeIcon(String? parcelType) {
 }
 
 String printDate(String date) {
-  return DateFormat('dd MMM yyyy').format(DateTime.parse(date).toLocal()) + " at " + DateFormat('hh:mm a').format(DateTime.parse(date).toLocal());
+  return DateFormat('dd MMM yyyy').format(DateTime.parse(date).toLocal()) +
+      " at " +
+      DateFormat('hh:mm a').format(DateTime.parse(date).toLocal());
 }
 
 String printDateWithoutAt(String date) {
-  return DateFormat('dd MMM yyyy').format(DateTime.parse(date).toLocal()) + " " + DateFormat('hh:mm a').format(DateTime.parse(date).toLocal());
+  return DateFormat('dd MMM yyyy').format(DateTime.parse(date).toLocal()) +
+      " " +
+      DateFormat('hh:mm a').format(DateTime.parse(date).toLocal());
 }
 
 Widget loaderWidget() {
@@ -173,7 +239,14 @@ Widget loaderWidget() {
 }
 
 Widget emptyWidget() {
-  return Center(child: Image.asset(ic_no_data, width: 80, height: 80, color: ColorUtils.colorPrimary));
+  return Center(
+    child: Image.asset(
+      ic_no_data,
+      width: 80,
+      height: 80,
+      color: ColorUtils.colorPrimary,
+    ),
+  );
 }
 
 String orderStatus(String orderStatus) {
@@ -199,11 +272,11 @@ String orderStatus(String orderStatus) {
     return language.shipped;
   } else if (orderStatus == ORDER_PENDING) {
     return language.pending;
-  } else if(orderStatus == "reject_bid") {
+  } else if (orderStatus == "reject_bid") {
     return language.bidRejected;
-  } else if(orderStatus == "bid_accept") {
+  } else if (orderStatus == "bid_accept") {
     return language.bidAccepted;
-  } else if(orderStatus == "bid_placed"){
+  } else if (orderStatus == "bid_placed") {
     return language.bidPlaced;
   } else {
     return language.reschedule;
@@ -311,12 +384,19 @@ oneSignalSettings() async {
         if (!appStore.isLoggedIn) {
           LoginScreen().launch(getContext);
         } else if (notId.toString().contains('CHAT')) {
-          UserData user = await getUserDetail(int.parse(notId.toString().replaceAll("CHAT_", "")));
+          UserData user = await getUserDetail(
+            int.parse(notId.toString().replaceAll("CHAT_", "")),
+          );
           ChatScreen(userData: user).launch(getContext);
         } else if (notId.toString().contains('ORDER_')) {
-          String numericPart = notId.toString().replaceAll(RegExp(r'\D'), ''); // Removes all non-digits
+          String numericPart = notId.toString().replaceAll(
+            RegExp(r'\D'),
+            '',
+          ); // Removes all non-digits
           int orderId = int.parse(numericPart); // ✅ Works fine with "296"
-          OrderDetailScreen(orderId: int.parse(orderId.toString())).launch(getContext);
+          OrderDetailScreen(
+            orderId: int.parse(orderId.toString()),
+          ).launch(getContext);
         } else {
           if (getStringAsync(USER_TYPE) == DELIVERY_MAN) {
             DeliveryDashBoard().launch(getContext);
@@ -327,10 +407,17 @@ oneSignalSettings() async {
       }
     });
     OneSignal.Notifications.addForegroundWillDisplayListener((event) {
-      print('NOTIFICATION WILL DISPLAY LISTENER CALLED WITH: ${event.notification.jsonRepresentation()}');
+      print(
+        'NOTIFICATION WILL DISPLAY LISTENER CALLED WITH: ${event.notification.jsonRepresentation()}',
+      );
       event.preventDefault();
       event.notification.display();
-      if (event.notification.additionalData!["type"].toString().contains(ORDER_TRANSFER) || event.notification.additionalData!["type"].toString().contains(ORDER_ASSIGNED)) {
+      if (event.notification.additionalData!["type"].toString().contains(
+            ORDER_TRANSFER,
+          ) ||
+          event.notification.additionalData!["type"].toString().contains(
+            ORDER_ASSIGNED,
+          )) {
         if (getStringAsync(USER_TYPE) == DELIVERY_MAN) {
           playSoundForDuration();
         }
@@ -342,7 +429,10 @@ oneSignalSettings() async {
 // Method to play the sound for 60 seconds
 void playSoundForDuration() async {
   try {
-    FlutterRingtonePlayer().play(fromAsset: "assets/ringtone/ringtone.mp3", looping: true);
+    FlutterRingtonePlayer().play(
+      fromAsset: "assets/ringtone/ringtone.mp3",
+      looping: true,
+    );
     await Future.delayed(Duration(seconds: 60));
     FlutterRingtonePlayer().stop();
   } catch (e) {
@@ -357,7 +447,8 @@ Future<void> saveOneSignalPlayerId() async {
     print(OneSignal.User.pushSubscription.token);
     print(state.current.jsonRepresentation());
 
-    if (OneSignal.User.pushSubscription.id.validate().isNotEmpty) await setValue(PLAYER_ID, OneSignal.User.pushSubscription.id.validate());
+    if (OneSignal.User.pushSubscription.id.validate().isNotEmpty)
+      await setValue(PLAYER_ID, OneSignal.User.pushSubscription.id.validate());
   });
 }
 
@@ -383,11 +474,11 @@ String statusTypeIcon({String? type}) {
     icon = ic_order_draft;
   } else if (type == ORDER_TRANSFER) {
     icon = ic_order_transfer;
-  } else if(type == "reject_bid") {
+  } else if (type == "reject_bid") {
     icon = ic_bid;
-  } else if(type == "bid_accept") {
+  } else if (type == "bid_accept") {
     icon = ic_bid;
-  } else if(type == "bid_placed"){
+  } else if (type == "bid_placed") {
     icon = ic_bid;
   }
   return icon;
@@ -410,7 +501,7 @@ String? orderTitle(String orderStatus) {
     return language.orderCancelConfirmation;
   } else if (orderStatus == ORDER_CREATED) {
     return language.orderCreateConfirmation;
-  }  else if (orderStatus == ORDER_PENDING) {
+  } else if (orderStatus == ORDER_PENDING) {
     return "Are you sure you want to accept this Order";
   }
   return '';
@@ -422,9 +513,15 @@ String dateParse(String date) {
 
 bool get isRTL => rtlLanguage.contains(appStore.selectedLanguage);
 
-num countExtraCharge({required num totalAmount, required String chargesType, required num charges}) {
+num countExtraCharge({
+  required num totalAmount,
+  required String chargesType,
+  required num charges,
+}) {
   if (chargesType == CHARGE_TYPE_PERCENTAGE) {
-    return (totalAmount * charges * 0.01).toStringAsFixed(digitAfterDecimal).toDouble();
+    return (totalAmount * charges * 0.01)
+        .toStringAsFixed(digitAfterDecimal)
+        .toDouble();
   } else {
     return charges.toStringAsFixed(digitAfterDecimal).toDouble();
   }
@@ -457,9 +554,11 @@ String paymentType(String paymentType) {
     return language.razorpay;
   } else if (paymentType.toLowerCase() == PAYMENT_TYPE_PAYSTACK.toLowerCase()) {
     return language.payStack;
-  } else if (paymentType.toLowerCase() == PAYMENT_TYPE_FLUTTERWAVE.toLowerCase()) {
+  } else if (paymentType.toLowerCase() ==
+      PAYMENT_TYPE_FLUTTERWAVE.toLowerCase()) {
     return language.flutterWave;
-  } else if (paymentType.toLowerCase() == PAYMENT_TYPE_MERCADOPAGO.toLowerCase()) {
+  } else if (paymentType.toLowerCase() ==
+      PAYMENT_TYPE_MERCADOPAGO.toLowerCase()) {
     return language.mercadoPago;
   } else if (paymentType.toLowerCase() == PAYMENT_TYPE_PAYPAL.toLowerCase()) {
     return language.paypal;
@@ -467,7 +566,8 @@ String paymentType(String paymentType) {
     return language.payTabs;
   } else if (paymentType.toLowerCase() == PAYMENT_TYPE_PAYTM.toLowerCase()) {
     return language.paytm;
-  } else if (paymentType.toLowerCase() == PAYMENT_TYPE_MYFATOORAH.toLowerCase()) {
+  } else if (paymentType.toLowerCase() ==
+      PAYMENT_TYPE_MYFATOORAH.toLowerCase()) {
     return language.myFatoorah;
   } else if (paymentType.toLowerCase() == PAYMENT_TYPE_CASH.toLowerCase()) {
     return language.cash;
@@ -478,12 +578,17 @@ String paymentType(String paymentType) {
 }
 
 String printAmount(var amount) {
-  return appStore.currencyPosition == CURRENCY_POSITION_LEFT ? '${appStore.currencySymbol} ${amount.toStringAsFixed(digitAfterDecimal)}' : '${amount.toStringAsFixed(digitAfterDecimal)} ${appStore.currencySymbol}';
+  return appStore.currencyPosition == CURRENCY_POSITION_LEFT
+      ? '${appStore.currencySymbol} ${amount.toStringAsFixed(digitAfterDecimal)}'
+      : '${amount.toStringAsFixed(digitAfterDecimal)} ${appStore.currencySymbol}';
 }
 
 Future<void> commonLaunchUrl(String url, {bool forceWebView = false}) async {
   log(url);
-  await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication).then((value) {}).catchError((e) {
+  await launchUrl(
+    Uri.parse(url),
+    mode: LaunchMode.externalApplication,
+  ).then((value) {}).catchError((e) {
     toast('${language.invalidUrl}: $url');
   });
 }
@@ -496,7 +601,11 @@ cashConfirmDialog() {
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(language.balanceInsufficientCashPayment, style: primaryTextStyle(size: 16), textAlign: TextAlign.center),
+          Text(
+            language.balanceInsufficientCashPayment,
+            style: primaryTextStyle(size: 16),
+            textAlign: TextAlign.center,
+          ),
           30.height,
           commonButton(language.ok, () {
             finish(getContext);
@@ -509,24 +618,34 @@ cashConfirmDialog() {
 
 Future deleteAccount(BuildContext context) async {
   appStore.setLoading(true);
-  await userService.removeDocument(getStringAsync(UID)).then((value) async {
-    await deleteUserFirebase().then((value) async {
-      Map deleteAccountReq = {"id": getIntAsync(USER_ID), "type": "forcedelete"};
-      await userAction(deleteAccountReq).then((value) async {
-        await logout(context, isDeleteAccount: true).then((value) async {
-          appStore.setLoading(false);
-          await removeKey(USER_EMAIL);
-          await removeKey(USER_PASSWORD);
-        });
+  await userService
+      .removeDocument(getStringAsync(UID))
+      .then((value) async {
+        await deleteUserFirebase()
+            .then((value) async {
+              Map deleteAccountReq = {
+                "id": getIntAsync(USER_ID),
+                "type": "forcedelete",
+              };
+              await userAction(deleteAccountReq).then((value) async {
+                await logout(context, isDeleteAccount: true).then((
+                  value,
+                ) async {
+                  appStore.setLoading(false);
+                  await removeKey(USER_EMAIL);
+                  await removeKey(USER_PASSWORD);
+                });
+              });
+            })
+            .catchError((error) {
+              appStore.setLoading(false);
+              toast(error.toString());
+            });
+      })
+      .catchError((error) {
+        appStore.setLoading(false);
+        toast(error.toString());
       });
-    }).catchError((error) {
-      appStore.setLoading(false);
-      toast(error.toString());
-    });
-  }).catchError((error) {
-    appStore.setLoading(false);
-    toast(error.toString());
-  });
 }
 
 String timeAgo(String date) {
@@ -581,8 +700,14 @@ List<String> userTypeList = [CLIENT, DELIVERY_MAN];
 //   }
 // }
 
-Future<void> openMap(double originLatitude, double originLongitude, double destinationLatitude, double destinationLongitude) async {
-  String googleUrl = 'https://www.google.com/maps/dir/?api=1&origin=$originLatitude,$originLongitude&destination=$destinationLatitude,$destinationLongitude';
+Future<void> openMap(
+  double originLatitude,
+  double originLongitude,
+  double destinationLatitude,
+  double destinationLongitude,
+) async {
+  String googleUrl =
+      'https://www.google.com/maps/dir/?api=1&origin=$originLatitude,$originLongitude&destination=$destinationLatitude,$destinationLongitude';
 
   if (await canLaunchUrl(Uri.parse(googleUrl))) {
     await launchUrl(Uri.parse(googleUrl));
@@ -620,12 +745,9 @@ getClaimStatus(String status) {
 }
 //List<String> SUPPORT_TYPE = ["Vehicle", "Orders", "Delivery person"];
 
-Widget popupDialog(String title,String message){
-
+Widget popupDialog(String title, String message) {
   return Dialog(
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(16),
-    ),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     child: Container(
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -642,13 +764,10 @@ Widget popupDialog(String title,String message){
               color: Colors.red.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              Icons.warning_rounded,
-              color: Colors.red,
-              size: 40,
-            ),
+            child: Icon(Icons.warning_rounded, color: Colors.red, size: 40),
           ),
           SizedBox(height: 16),
+
           /// Title
           Text(
             title,
@@ -659,16 +778,15 @@ Widget popupDialog(String title,String message){
             ),
           ),
           SizedBox(height: 12),
+
           /// Message
           Text(
             message,
             textAlign: TextAlign.left,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.black87),
           ),
           SizedBox(height: 24),
+
           /// Button
           SizedBox(
             width: double.infinity,
@@ -696,7 +814,6 @@ Widget popupDialog(String title,String message){
       ),
     ),
   );
-
 }
 
 String generate6DigitCode() {

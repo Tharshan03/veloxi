@@ -70,13 +70,16 @@ class RegisterScreenState extends State<RegisterScreen> {
         String name = Encryption.instance.encrypt(nameController.text);
         String username = Encryption.instance.encrypt(emailController.text);
         String userType = Encryption.instance.encrypt(widget.userType!);
-        String contactNumber = Encryption.instance
-            .encrypt('$countryCode ${phoneController.text.trim()}');
+        String contactNumber = Encryption.instance.encrypt(
+          '$countryCode ${phoneController.text.trim()}',
+        );
         String email = Encryption.instance.encrypt(emailController.text.trim());
-        String password =
-            Encryption.instance.encrypt(passController.text.trim());
-        String playerId =
-            Encryption.instance.encrypt(getStringAsync(PLAYER_ID).validate());
+        String password = Encryption.instance.encrypt(
+          passController.text.trim(),
+        );
+        String playerId = Encryption.instance.encrypt(
+          getStringAsync(PLAYER_ID).validate(),
+        );
         String partnerRefCode = partnerCodeController.text.isNotEmpty
             ? Encryption.instance.encrypt(partnerCodeController.text.trim())
             : ''; // Provide a default value if empty
@@ -89,38 +92,43 @@ class RegisterScreenState extends State<RegisterScreen> {
           "email": email,
           "password": password,
           "player_id": playerId,
-          "partner_referral_code": partnerRefCode
+          "partner_referral_code": partnerRefCode,
           // if (widget.userType == DELIVERY_MAN) "status": 1
         };
 
         log("request      =====>>> ${request}");
 
-        await signUpApi(request).then((res) async {
-          await setValue(USER_TOKEN, res.data!.apiToken.validate());
-          await setValue(USER_ID, res.data!.id.validate());
-          authService
-              .signUpWithEmailPassword(getContext,
-                  lName: res.data!.name,
-                  userName: res.data!.username,
-                  name: res.data!.name,
-                  email: res.data!.email,
-                  password: passController.text.trim(),
-                  mobileNumber: res.data!.contactNumber,
-                  userType: res.data!.userType,
-                  userData: res)
-              .then((res) async {
-            //
-          }).catchError((e, s) {
-            appStore.setLoading(false);
-            log(e.toString());
-            toast(e.toString());
-          });
-        }).catchError((e) {
-          appStore.setLoading(false);
-          toast(e.toString());
-          log(e.toString());
-          return;
-        });
+        await signUpApi(request)
+            .then((res) async {
+              await setValue(USER_TOKEN, res.data!.apiToken.validate());
+              await setValue(USER_ID, res.data!.id.validate());
+              authService
+                  .signUpWithEmailPassword(
+                    getContext,
+                    lName: res.data!.name,
+                    userName: res.data!.username,
+                    name: res.data!.name,
+                    email: res.data!.email,
+                    password: passController.text.trim(),
+                    mobileNumber: res.data!.contactNumber,
+                    userType: res.data!.userType,
+                    userData: res,
+                  )
+                  .then((res) async {
+                    //
+                  })
+                  .catchError((e, s) {
+                    appStore.setLoading(false);
+                    log(e.toString());
+                    toast(e.toString());
+                  });
+            })
+            .catchError((e) {
+              appStore.setLoading(false);
+              toast(e.toString());
+              log(e.toString());
+              return;
+            });
       } else {
         toast(language.acceptTermService);
       }
@@ -171,13 +179,14 @@ class RegisterScreenState extends State<RegisterScreen> {
                   Text(language.email, style: primaryTextStyle()),
                   8.height,
                   AppTextField(
-                      controller: emailController,
-                      textFieldType: TextFieldType.EMAIL,
-                      focus: emailFocus,
-                      nextFocus: phoneFocus,
-                      decoration: commonInputDecoration(),
-                      errorThisFieldRequired: language.fieldRequiredMsg,
-                      errorInvalidEmail: language.emailInvalid),
+                    controller: emailController,
+                    textFieldType: TextFieldType.EMAIL,
+                    focus: emailFocus,
+                    nextFocus: phoneFocus,
+                    decoration: commonInputDecoration(),
+                    errorThisFieldRequired: language.fieldRequiredMsg,
+                    errorInvalidEmail: language.emailInvalid,
+                  ),
                   16.height,
                   Text(language.contactNumber, style: primaryTextStyle()),
                   8.height,
@@ -195,24 +204,31 @@ class RegisterScreenState extends State<RegisterScreen> {
                               initialSelection: countryCode,
                               showCountryOnly: false,
                               dialogSize: Size(
-                                  context.width() - 60, context.height() * 0.6),
+                                context.width() - 60,
+                                context.height() * 0.6,
+                              ),
                               showFlag: true,
                               showFlagDialog: true,
                               showOnlyCountryWhenClosed: false,
                               alignLeft: false,
                               textStyle: primaryTextStyle(),
-                              dialogBackgroundColor:
-                                  Theme.of(context).cardColor,
+                              dialogBackgroundColor: Theme.of(
+                                context,
+                              ).cardColor,
                               barrierColor: Colors.black12,
                               dialogTextStyle: primaryTextStyle(),
                               searchDecoration: InputDecoration(
                                 iconColor: Theme.of(context).dividerColor,
                                 enabledBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Theme.of(context).dividerColor)),
+                                  borderSide: BorderSide(
+                                    color: Theme.of(context).dividerColor,
+                                  ),
+                                ),
                                 focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: ColorUtils.colorPrimary)),
+                                  borderSide: BorderSide(
+                                    color: ColorUtils.colorPrimary,
+                                  ),
+                                ),
                               ),
                               searchStyle: primaryTextStyle(),
                               onInit: (c) {
@@ -223,7 +239,8 @@ class RegisterScreenState extends State<RegisterScreen> {
                               },
                             ),
                             VerticalDivider(
-                                color: Colors.grey.withValues(alpha:0.5)),
+                              color: Colors.grey.withValues(alpha: 0.5),
+                            ),
                           ],
                         ),
                       ),
@@ -234,9 +251,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                       // if (value.trim().length < minContactLength || value.trim().length > maxContactLength) return language.contactLength;
                       return null;
                     },
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                    ],
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   ),
                   16.height,
                   Text(language.password, style: primaryTextStyle()),
@@ -266,8 +281,9 @@ class RegisterScreenState extends State<RegisterScreen> {
                         height: 20,
                         width: 20,
                         child: Checkbox(
-                          shape:
-                              RoundedRectangleBorder(borderRadius: radius(4)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: radius(4),
+                          ),
                           checkColor: Colors.white,
                           materialTapTargetSize:
                               MaterialTapTargetSize.shrinkWrap,
@@ -282,31 +298,42 @@ class RegisterScreenState extends State<RegisterScreen> {
                       ),
                       10.width,
                       RichText(
-                        text: TextSpan(children: [
-                          TextSpan(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
                               text: '${language.iAgreeToThe} ',
-                              style: secondaryTextStyle()),
-                          TextSpan(
-                            text: language.termOfService,
-                            style: boldTextStyle(
-                                color: ColorUtils.colorPrimary, size: 14),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                commonLaunchUrl(mTermAndCondition);
-                              },
-                          ),
-                          TextSpan(text: ' & ', style: secondaryTextStyle()),
-                          TextSpan(
-                            text: language.privacyPolicy,
-                            style: boldTextStyle(
-                                color: ColorUtils.colorPrimary, size: 14),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                commonLaunchUrl(mPrivacyPolicy);
-                              },
-                          ),
-                        ]),
-                      ).expand()
+                              style: secondaryTextStyle(),
+                            ),
+                            TextSpan(
+                              text: language.termOfService,
+                              style: boldTextStyle(
+                                color: ColorUtils.colorPrimary,
+                                size: 14,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  if (widget.userType == DELIVERY_MAN) {
+                                    commonLaunchUrl(mdTermAndCondition);
+                                  } else {
+                                    commonLaunchUrl(mTermAndCondition);
+                                  }
+                                },
+                            ),
+                            TextSpan(text: ' & ', style: secondaryTextStyle()),
+                            TextSpan(
+                              text: language.privacyPolicy,
+                              style: boldTextStyle(
+                                color: ColorUtils.colorPrimary,
+                                size: 14,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  commonLaunchUrl(mPrivacyPolicy);
+                                },
+                            ),
+                          ],
+                        ),
+                      ).expand(),
                     ],
                   ),
                   30.height,
@@ -317,13 +344,15 @@ class RegisterScreenState extends State<RegisterScreen> {
                   Row(
                     mainAxisAlignment: .center,
                     children: [
-                      Text(language.alreadyHaveAnAccount,
-                          style: primaryTextStyle()),
+                      Text(
+                        language.alreadyHaveAnAccount,
+                        style: primaryTextStyle(),
+                      ),
                       4.width,
-                      Text(language.signIn,
-                              style:
-                                  boldTextStyle(color: ColorUtils.colorPrimary))
-                          .onTap(() {
+                      Text(
+                        language.signIn,
+                        style: boldTextStyle(color: ColorUtils.colorPrimary),
+                      ).onTap(() {
                         finish(context);
                       }),
                     ],
@@ -334,7 +363,8 @@ class RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
           Observer(
-              builder: (context) => loaderWidget().visible(appStore.isLoading)),
+            builder: (context) => loaderWidget().visible(appStore.isLoading),
+          ),
         ],
       ),
     );
